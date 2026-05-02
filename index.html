@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kisan Sahayak AI - Global Command Center</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #080C09; color: white; overflow: hidden; }
+        h1, h2, h3 { font-family: 'Outfit', sans-serif; }
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .accent-glow { box-shadow: 0 0 30px rgba(233, 196, 106, 0.15); }
+        @keyframes pulse { 0%, 100% { height: 10px; opacity: 0.5; } 50% { height: 35px; opacity: 1; } }
+        .wave-bar { width: 4px; background: linear-gradient(to top, #2D5A27, #E9C46A); border-radius: 4px; animation: pulse 1s infinite ease-in-out; }
+        .sidebar-item:hover { background: rgba(255,255,255,0.05); color: #E9C46A; }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #2A9D8F; box-shadow: 0 0 10px #2A9D8F; }
+    </style>
+</head>
+<body class="h-screen flex">
+    <!-- Sidebar -->
+    <aside class="w-72 glass border-r border-white/5 p-6 flex flex-col">
+        <div class="text-2xl font-black text-[#E9C46A] mb-12 flex items-center gap-3">
+            <i data-lucide="zap"></i> KISAN AI
+        </div>
+        
+        <nav class="space-y-2 flex-1">
+            <div class="sidebar-item p-4 rounded-xl flex items-center gap-4 transition cursor-pointer text-[#E9C46A] bg-white/5">
+                <i data-lucide="layout-dashboard" class="w-5"></i> Dashboard
+            </div>
+            <div class="sidebar-item p-4 rounded-xl flex items-center gap-4 transition cursor-pointer text-gray-400">
+                <i data-lucide="users" class="w-5"></i> Farmer Network
+            </div>
+            <div class="sidebar-item p-4 rounded-xl flex items-center gap-4 transition cursor-pointer text-gray-400">
+                <i data-lucide="file-text" class="w-5"></i> Applications
+            </div>
+            <div class="sidebar-item p-4 rounded-xl flex items-center gap-4 transition cursor-pointer text-gray-400">
+                <i data-lucide="settings" class="w-5"></i> AI Config
+            </div>
+        </nav>
+
+        <div class="glass p-4 rounded-2xl mt-auto">
+            <div class="flex items-center gap-3 mb-2">
+                <div class="status-dot"></div>
+                <span class="text-xs font-bold uppercase tracking-widest text-gray-400">Backend Live</span>
+            </div>
+            <p class="text-[10px] text-gray-500 font-mono">Port 8001 | Active Connections: 124</p>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-8 overflow-y-auto bg-[radial-gradient(circle_at_50%_0%,#1a3c1e_0%,#080C09_60%)]">
+        <div class="flex justify-between items-start mb-12">
+            <div>
+                <h1 class="text-4xl font-extrabold text-white mb-2">Global Command Center</h1>
+                <p class="text-gray-400">Real-time monitoring of AI Farmer Assistance operations.</p>
+            </div>
+            <div class="flex gap-4">
+                <div class="glass px-6 py-3 rounded-2xl flex items-center gap-4">
+                    <span class="text-gray-500 text-sm">Uptime</span>
+                    <span class="font-mono text-[#E9C46A]">99.9%</span>
+                </div>
+                <div class="glass px-6 py-3 rounded-2xl flex items-center gap-4">
+                    <span class="text-gray-500 text-sm">Success Rate</span>
+                    <span class="font-mono text-[#2A9D8F]">94.2%</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-12 gap-8">
+            <!-- Mobile App Simulator -->
+            <div class="col-span-12 xl:col-span-4 flex justify-center">
+                <div class="w-80 h-[680px] bg-black rounded-[48px] border-[10px] border-gray-800 relative overflow-hidden shadow-[0_50px_100px_rgba(0,0,0,0.8)] accent-glow">
+                    <div id="app-screen" class="p-8 flex flex-col h-full text-left bg-[#0A0F0A]">
+                        <div class="flex justify-between items-center mb-10">
+                            <div class="text-gray-500 font-mono text-xs">12:44 PM</div>
+                            <div class="flex gap-1">
+                                <div class="w-1 h-3 bg-gray-600 rounded-sm"></div>
+                                <div class="w-1 h-3 bg-gray-600 rounded-sm"></div>
+                                <div class="w-1 h-3 bg-[#E9C46A] rounded-sm"></div>
+                            </div>
+                        </div>
+
+                        <div class="text-5xl mb-6">🤖</div>
+                        <h3 id="step-title" class="text-2xl font-bold leading-tight">Namaste! How can I help you?</h3>
+                        <p id="step-subtitle" class="text-gray-400 mt-2 mb-8">ನಮಸ್ತೆ! ಇಂದು ನಾನು ನಿಮಗೆ ಹೇಗೆ ಸಹಾಯ ಮಾಡಲಿ?</p>
+                        
+                        <div class="flex items-center gap-1.5 mb-auto">
+                            <div class="wave-bar h-4" style="animation-delay: 0.1s"></div>
+                            <div class="wave-bar h-2" style="animation-delay: 0.2s"></div>
+                            <div class="wave-bar h-6" style="animation-delay: 0.3s"></div>
+                            <div class="wave-bar h-3" style="animation-delay: 0.4s"></div>
+                            <div class="wave-bar h-7" style="animation-delay: 0.5s"></div>
+                            <div class="wave-bar h-2" style="animation-delay: 0.6s"></div>
+                            <div class="wave-bar h-5" style="animation-delay: 0.7s"></div>
+                        </div>
+
+                        <div id="options-container" class="space-y-4">
+                            <button onclick="nextStep()" class="w-full glass p-5 rounded-2xl flex items-center gap-4 font-bold hover:bg-white/10 transition active:scale-95">
+                                <span class="bg-[#E9C46A]/20 p-3 rounded-xl">🚜</span> PM-Kisan Apply
+                            </button>
+                            <button onclick="nextStep()" class="w-full glass p-5 rounded-2xl flex items-center gap-4 font-bold hover:bg-white/10 transition active:scale-95">
+                                <span class="bg-[#E9C46A]/20 p-3 rounded-xl">🛡️</span> Crop Insurance
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats & Brain -->
+            <div class="col-span-12 xl:col-span-8 space-y-8">
+                <!-- Top Row Stats -->
+                <div class="grid grid-cols-3 gap-6">
+                    <div class="glass p-6 rounded-3xl">
+                        <p class="text-gray-500 text-sm mb-1">Total Farmers</p>
+                        <p class="text-3xl font-bold">12,842</p>
+                        <p class="text-xs text-[#2A9D8F] mt-2">+14% this week</p>
+                    </div>
+                    <div class="glass p-6 rounded-3xl">
+                        <p class="text-gray-500 text-sm mb-1">Voice Intent Accuracy</p>
+                        <p class="text-3xl font-bold">98.1%</p>
+                        <div class="w-full bg-white/5 h-1 rounded-full mt-3">
+                            <div class="bg-[#E9C46A] h-1 rounded-full w-[98%]"></div>
+                        </div>
+                    </div>
+                    <div class="glass p-6 rounded-3xl">
+                        <p class="text-gray-500 text-sm mb-1">Processing Delay</p>
+                        <p class="text-3xl font-bold">0.42s</p>
+                        <p class="text-xs text-gray-500 mt-2">Edge Optimization On</p>
+                    </div>
+                </div>
+
+                <!-- AI Brain Log -->
+                <div class="glass p-8 rounded-3xl h-[420px] flex flex-col">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-bold flex items-center gap-3">
+                            <i data-lucide="cpu" class="text-[#E9C46A]"></i> AI Perception Log
+                        </h3>
+                        <span class="text-xs font-mono text-gray-500">Live Stream ::: ACTIVE</span>
+                    </div>
+                    <div id="log-stream" class="flex-1 font-mono text-sm space-y-3 overflow-y-auto pr-4 custom-scrollbar">
+                        <div class="flex gap-4">
+                            <span class="text-gray-600">[12:44:01]</span>
+                            <span class="text-[#2A9D8F]">INTENT DETECTED:</span>
+                            <span class="text-white italic">"Apply for PM Kisan Samman Nidhi"</span>
+                        </div>
+                        <div class="flex gap-4">
+                            <span class="text-gray-600">[12:44:03]</span>
+                            <span class="text-[#E9C46A]">ACTION:</span>
+                            <span class="text-white">Triggering Camera Module (OCR Enabled)</span>
+                        </div>
+                        <div class="flex gap-4">
+                            <span class="text-gray-600">[12:44:10]</span>
+                            <span class="text-[#2A9D8F]">OCR EXTRACTED:</span>
+                            <span class="text-white">Aadhaar: XXXX-XXXX-4521 | Name: Rajesh Kumar</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        lucide.createIcons();
+        
+        let currentStep = 0;
+        const steps = [
+            {
+                title: "Scan your Aadhaar Card",
+                subtitle: "Point your camera at the front side of the card.",
+                options: ["Scanning... 📸"],
+                icons: ["✨"],
+                log: "SYSTEM: Activating Camera Native Plugin... OCR waiting for buffer."
+            },
+            {
+                title: "Details Verified!",
+                subtitle: "Name: Rajesh Kumar | Aadhaar: **** 4521",
+                options: ["Proceed 👍", "Try Again"],
+                icons: ["✅", "🔄"],
+                log: "AI: Entity Extraction Successful. Identity matched against National Database."
+            },
+            {
+                title: "Submit Application?",
+                subtitle: "I will now submit this for PM-Kisan benefit.",
+                options: ["Submit Now 🚀", "Exit"],
+                icons: ["📤", "✖️"],
+                log: "USER: Voice confirmation received. API Payload generated."
+            }
+        ];
+
+        function nextStep() {
+            if (currentStep >= steps.length) {
+                location.reload();
+                return;
+            }
+            const s = steps[currentStep];
+            document.getElementById('step-title').innerText = s.title;
+            document.getElementById('step-subtitle').innerText = s.subtitle;
+            
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            s.options.forEach((opt, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'w-full glass p-5 rounded-2xl flex items-center gap-4 font-bold hover:bg-white/10 transition active:scale-95';
+                btn.onclick = nextStep;
+                btn.innerHTML = `<span class="bg-[#E9C46A]/20 p-3 rounded-xl">${s.icons[i]}</span> ${opt}`;
+                container.appendChild(btn);
+            });
+
+            // Add log
+            const logStream = document.getElementById('log-stream');
+            const logEntry = document.createElement('div');
+            logEntry.className = 'flex gap-4 opacity-0 transition-all duration-500 transform translate-x-4';
+            logEntry.innerHTML = `<span class="text-gray-600">[${new Date().toLocaleTimeString()}]</span> <span class="text-[#E9C46A]">LOG:</span> <span class="text-white">${s.log}</span>`;
+            logStream.appendChild(logEntry);
+            setTimeout(() => { logEntry.classList.remove('opacity-0', 'translate-x-4'); }, 50);
+            logStream.scrollTop = logStream.scrollHeight;
+
+            currentStep++;
+        }
+    </script>
+</body>
+</html>
