@@ -1,0 +1,10 @@
+node_modules/
+__pycache__/
+*.zip
+.venv/
+venv/
+env/
+KisanSahayakApp/android/app/build/
+KisanSahayakApp/android/.gradle/
+KisanSahayakApp/ios/Pods/
+tmp_src/
