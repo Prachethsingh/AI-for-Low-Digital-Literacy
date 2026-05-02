@@ -38,14 +38,12 @@ OLLAMA_MODEL = "qwen3.5:latest"   # fallback to qwen2.5 if qwen3.5 unavailable
 # ══════════════════════════════════════════════════════════════════════════════
 
 class EligibilityRequest(BaseModel):
-    is_farmer: bool
-    has_aadhaar: bool
-    is_woman: bool = False
-    language: str = "kannada"   # "kannada" | "english"
+    profile: dict
+    lang: str = "en"
 
 class TextQueryRequest(BaseModel):
-    text: str
-    language: str = "kannada"
+    query: str
+    lang: str = "en"
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -55,15 +53,11 @@ class TextQueryRequest(BaseModel):
 def build_eligibility_prompt(req: EligibilityRequest) -> str:
     lang_instruction = (
         "Respond with scheme explanations in Kannada language."
-        if req.language == "kannada"
+        if req.lang == "kn"
         else "Respond with scheme explanations in English."
     )
 
-    profile = {
-        "is_farmer": req.is_farmer,
-        "has_aadhaar": req.has_aadhaar,
-        "is_woman": req.is_woman,
-    }
+    profile = req.profile
 
     scheme_list = json.dumps(
         [{"id": s["id"], "name": s["name_en"], "requires_farmer": s["requires_farmer"],
@@ -103,18 +97,28 @@ async def call_ollama(prompt: str) -> str:
 
 
 def filter_schemes_locally(req: EligibilityRequest) -> list[str]:
-    """
-    Fast local fallback (no Ollama needed) — rule-based eligibility.
-    Used when Ollama is unavailable or for pre-caching.
-    """
+    profile = req.profile
     eligible = []
+    
+    # Map different possible keys for the same concepts
+    is_farmer = profile.get("is_farmer", False) or profile.get("farmer_type") in ["small", "marginal"] or profile.get("q1") == "yes"
+    has_aadhaar = profile.get("has_aadhaar", False) or profile.get("q2") == "yes" or profile.get("q2_cam") is not None
+    is_woman = profile.get("is_woman", False)
+
     for s in SCHEMES:
-        if s["requires_farmer"] and not req.is_farmer:
+        # Rule-based filtering
+        if s["requires_farmer"] and not is_farmer:
             continue
-        if s["requires_aadhaar"] and not req.has_aadhaar:
+        if s["requires_aadhaar"] and not has_aadhaar:
             continue
-        if s.get("for_women", False) and not req.is_woman:
+        if s.get("for_women", False) and not is_woman:
             continue
+        
+        # Specific logic for PM Kisan (needs land registered and small/medium land)
+        if s["id"] == "pmkisan":
+            if profile.get("q3") == "no": # land not registered
+                continue
+        
         eligible.append(s["id"])
     return eligible
 
@@ -155,7 +159,7 @@ async def get_eligible_schemes(req: EligibilityRequest):
 
     return {
         "eligible_schemes": result,
-        "language": req.language,
+        "lang": req.lang,
         "source": "ollama" if ollama_ids else "local",
     }
 
@@ -200,17 +204,17 @@ async def transcribe_audio(file: UploadFile = File(...)):
 async def ask_free_text(req: TextQueryRequest):
     """Free-form voice query → AI answer about schemes."""
     prompt = f"""You are a helpful Indian government scheme assistant for farmers.
-Answer this question briefly in {"Kannada" if req.language == "kannada" else "English"}.
+Answer this question briefly in {"Kannada" if req.lang == "kn" else "English"}.
 Keep the answer under 3 sentences, very simple language.
 
-Question: {req.text}
+Question: {req.query}
 """
     try:
         answer = await call_ollama(prompt)
-        return {"answer": answer, "language": req.language}
+        return {"response": answer, "lang": req.lang}
     except Exception as e:
-        return {"answer": "ಮಾಹಿತಿ ಲಭ್ಯವಿಲ್ಲ. ದಯವಿಟ್ಟು ಪ್ರಯತ್ನಿಸಿ." if req.language == "kannada"
-                else "Information not available. Please try again.", "language": req.language}
+        return {"response": "ಮಾಹಿತಿ ಲಭ್ಯವಿಲ್ಲ. ದಯವಿಟ್ಟು ಪ್ರಯತ್ನಿಸಿ." if req.lang == "kn"
+                else "Information not available. Please try again.", "lang": req.lang}
 
 
 @app.get("/schemes")

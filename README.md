@@ -1,74 +1,74 @@
-# Kisan Sahayak (ಕಿಸಾನ್ ಸಹಾಯಕ) 🌾
-AI-First Agricultural Assistant for Low-Literacy Users in Karnataka.
+# Kisan Mitra (AI Sahayak) 🌾
 
-## 🚀 Overview
-Kisan Sahayak is a voice-first mobile app designed for farmers. It simplifies finding government schemes using:
-- **Voice Interface:** Ask questions in Kannada/English.
-- **AI Processing:** Ollama (Qwen2.5) backend for intelligent query handling.
-- **Zero-Typing UX:** Big icons and voice-driven navigation.
-- **Multilingual Support:** Full Kannada and English localization.
+Kisan Mitra is an end-to-end, voice-first, AI-driven agriculture scheme assistant designed for low-literacy farmers in India. Built specifically for hackathons and rapid deployment, it provides an intuitive, highly accessible interface where users can discover, query, and apply for government schemes using their voice in local languages.
 
----
+## 🌟 Key Features
 
-## 🛠️ Tech Stack
-- **Frontend:** React Native (Expo/CLI), TypeScript, Haptics, TTS.
-- **Backend:** FastAPI (Python), Ollama (Local LLM), Whisper (Speech-to-Text).
-- **AI Models:** 
-  - `qwen2.5` (via Ollama) for reasoning.
-  - `openai-whisper` for transcription.
+*   **🗣️ Voice-First Interaction (Zero Literacy UI)**
+    *   No typing required. Users tap a single microphone button to speak.
+    *   Browser-native Text-to-Speech (TTS) automatically reads out all questions, schemes, and AI answers.
+    *   Big tap targets and skeuomorphic UI components optimized for rural mobile usage.
+*   **🤖 Ultra-Fast Open-Source AI Integration**
+    *   Powered by the **Groq API** running `llama-3.3-70b-versatile` natively.
+    *   Capable of understanding mixed-language queries, parsing intent, and providing accurate government scheme information in 2-3 simple sentences.
+    *   Built-in local fallback engine ensuring offline grace-degradation if network fails.
+*   **🌍 Bilingual Support**
+    *   Fully localized in **Kannada** and **English**, ensuring the app feels native to local demographics.
+    *   Prompts injected into the AI strictly enforce language alignment.
+*   **📈 Real-Time Live Dashboard**
+    *   A hidden analytics layer that tracks user profiling, scheme discovery, and application completions.
+    *   **Live Dashboard** screen updates instantly without refreshing via localized polling architecture (designed to mock realtime databases like Supabase locally).
+*   **📄 Dynamic Scheme Engine**
+    *   Interactive multi-step application flows for major schemes (PM-KISAN, PMFBY, PM-KUSUM, KCC, PMMVY, etc.).
+    *   Captures user profiling (Farmer status, Aadhaar possession, Gender) to automatically suggest eligible schemes.
 
----
+## 🏗️ Architecture & Tech Stack
 
-## 🏃 Setup Instructions
+*   **Frontend**: React 18 + Vite + TypeScript.
+*   **Styling**: Pure CSS tailored for a "glassmorphic" and accessible aesthetic (`index.css`).
+*   **AI Engine**: Groq SDK for instant sub-second inference.
+*   **Voice Engine**: Web Speech API (`webkitSpeechRecognition` & `speechSynthesis`).
+*   **Analytics/Database**: LocalStorage implementation mimicking a real-time database (drop-in replacement for Supabase).
 
-### 1. Prerequisites
-- **Python 3.10+**
-- **Node.js 18+**
-- **Ollama** installed (from ollama.com)
-- **ffmpeg** installed (required for Whisper)
+## 🚀 Getting Started
 
-### 2. Backend Setup
-1. Open a terminal in `./backend`.
-2. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-3. Pull the Ollama model:
-   ```bash
-   ollama pull qwen2.5
-   ```
-4. Start the server:
-   - **Windows:** `./run.ps1`
-   - **Linux/Mac:** `bash run.sh`
-   The backend runs at `http://localhost:8000`.
+The active codebase is located in the `kisan-mitra/kisan-mitra` directory.
 
-### 3. Frontend Setup
-1. Open a terminal in `./KisanSahayak`.
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Run on Android/iOS Emulator:
-   ```bash
-   npm run android
-   # or
-   npm run ios
-   ```
-   *Note: If using an Android Emulator, it connects to the host via `10.0.2.2`. This is pre-configured.*
+### 1. Setup
 
----
+```bash
+cd kisan-mitra/kisan-mitra
+npm install
+```
 
-## 📁 Project Structure
-- `/backend`: FastAPI server, Ollama logic, Whisper integration.
-- `/KisanSahayak`: React Native application code.
-  - `/src/components`: Big icons, Voice Recorder, etc.
-  - `/src/screens`: Specialized flows for low-literacy users.
-  - `/src/constants`: Bilingual translations and scheme data.
+### 2. Configuration
 
----
+The Groq API key is already hardcoded inside `src/lib/groq.ts` for immediate hackathon demonstration (`gsk_...`). 
+*If you need to change it, simply update the `apiKey` property in that file.*
 
-## ⚖️ Features
-- **Smart Eligibility:** Answer 3 simple icons (Farmer? Aadhaar? Woman?) to get filtered schemes.
-- **Voice Chat:** "ಸೌರ ಪಂಪ್ ಯೋಜನೆ ಬಗ್ಗೆ ತಿಳಿಸಿ" (Tell me about solar pump scheme) — AI answers and speaks.
-- **Audio Guides:** Every scheme description can be read aloud in Kannada.
-- **Offline Fallback:** If the AI server is down, the app uses built-in logic to show schemes.
+### 3. Run Development Server
+
+```bash
+npm run dev
+```
+
+Open `http://localhost:5173` in your browser. (Note: Chrome or Edge is highly recommended for full Web Speech API support).
+
+## 🗂️ Project Structure
+
+*   **`src/domain/schemes.ts`**: The core data layer containing all hardcoded government schemes, icons, details, and eligibility logic.
+*   **`src/ui/screens/`**: Contains the various UI views:
+    *   `VoiceScreen.tsx`: The chat interface communicating with Groq.
+    *   `ProfileScreen.tsx`: The profiling wizard.
+    *   `SchemeDetailScreen.tsx`: Detailed views of schemes.
+    *   `LiveDashboard.tsx`: The real-time mock-analytics dashboard.
+*   **`src/lib/`**: Contains external integrations:
+    *   `groq.ts`: The Groq SDK singleton and AI prompt logic.
+    *   `supabase.ts`: The LocalStorage analytics tracker (originally Supabase).
+*   **`src/ui/speech/useSpeech.ts`**: The custom hook managing browser voice APIs.
+
+## 💡 Important Notes for Demo
+
+1.  **Voice Input**: Microphone permissions must be granted. If you are serving the app on a mobile device, ensure you are using `HTTPS` or `localhost`, otherwise the browser will block the microphone API.
+2.  **Live Analytics**: Click the "Live" tab (📈) on the bottom navigation bar to view user interactions flowing in real-time. This is highly effective to show judges the backend tracking capabilities.
+3.  **Receipt Generation**: Upon completing an application flow, the app generates a downloadable `.txt` receipt to simulate an official confirmation document.
