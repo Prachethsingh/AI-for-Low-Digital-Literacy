@@ -7,12 +7,11 @@ import React, { useRef, useState, useEffect } from 'react';
 import {
   View,
   StyleSheet,
-  Animated,
-  Easing,
   Alert,
   Platform,
   PermissionsAndroid,
   useWindowDimensions,
+  Vibration,
 } from 'react-native';
 import {
   Text,
@@ -22,9 +21,20 @@ import {
   TouchableRipple,
 } from 'react-native-paper';
 import AudioRecorderPlayer from 'react-native-audio-recorder-player';
+import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
+import Animated, { 
+  useSharedValue, 
+  useAnimatedStyle, 
+  withRepeat, 
+  withTiming, 
+  withSequence,
+  interpolate,
+  Extrapolate
+} from 'react-native-reanimated';
 import { useAppContext } from '../context/AppContext';
 import { t } from '../constants/translations';
 
+// Single instance for the app to avoid conflicts
 const recorder = new AudioRecorderPlayer();
 
 interface VoiceRecorderProps {
@@ -43,8 +53,31 @@ export default function VoiceRecorder({ onTranscript, onError }: VoiceRecorderPr
   const ringSize = micSize + 16;
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const pulse = useRef(new Animated.Value(1)).current;
-  const pulseAnim = useRef<Animated.CompositeAnimation | null>(null);
+
+  // Animation values
+  const pulse = useSharedValue(1);
+
+  useEffect(() => {
+    if (isRecording) {
+      pulse.value = withRepeat(
+        withSequence(
+          withTiming(1.2, { duration: 500 }),
+          withTiming(1, { duration: 500 })
+        ),
+        -1,
+        true
+      );
+    } else {
+      pulse.value = withTiming(1);
+    }
+  }, [isRecording, pulse]);
+
+  const animatedMicStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ scale: pulse.value }],
+      opacity: interpolate(pulse.value, [1, 1.2], [1, 0.8], Extrapolate.CLAMP),
+    };
+  });
 
   useEffect(() => {
     return () => {
@@ -52,44 +85,20 @@ export default function VoiceRecorder({ onTranscript, onError }: VoiceRecorderPr
     };
   }, []);
 
-  const startPulse = () => {
-    pulseAnim.current = Animated.loop(
-      Animated.sequence([
-        Animated.timing(pulse, {
-          toValue: 1.35,
-          duration: 700,
-          easing: Easing.inOut(Easing.ease),
-          useNativeDriver: true,
-        }),
-        Animated.timing(pulse, {
-          toValue: 1,
-          duration: 700,
-          easing: Easing.inOut(Easing.ease),
-          useNativeDriver: true,
-        }),
-      ])
-    );
-    pulseAnim.current.start();
-  };
-
-  const stopPulse = () => {
-    pulseAnim.current?.stop();
-    Animated.timing(pulse, {
-      toValue: 1,
-      duration: 200,
-      useNativeDriver: true,
-    }).start();
-  };
-
   const handlePress = async () => {
     if (isProcessing) {
       return;
     }
 
     if (isRecording) {
-      setIsRecording(false);
-      stopPulse();
+      if (Platform.OS === 'android') {
+        ReactNativeHapticFeedback.trigger('notificationSuccess');
+      } else {
+        Vibration.vibrate([0, 50, 50, 50]);
+      }
+
       setIsProcessing(true);
+      setIsRecording(false);
 
       try {
         const path = await recorder.stopRecorder();
@@ -146,10 +155,15 @@ export default function VoiceRecorder({ onTranscript, onError }: VoiceRecorderPr
           }
         }
 
+        if (Platform.OS === 'android') {
+          ReactNativeHapticFeedback.trigger('impactLight');
+        } else {
+          Vibration.vibrate(50);
+        }
+
         await recorder.startRecorder();
         recorder.addRecordBackListener(() => {});
         setIsRecording(true);
-        startPulse();
 
         // Auto-stop after 10 seconds
         setTimeout(() => {
@@ -174,21 +188,6 @@ export default function VoiceRecorder({ onTranscript, onError }: VoiceRecorderPr
 
   return (
     <View style={styles.container}>
-      {/* Animated pulse ring behind the button */}
-      <Animated.View
-        style={[
-          styles.pulseRing,
-          {
-            width: ringSize,
-            height: ringSize,
-            borderRadius: ringSize / 2,
-            transform: [{ scale: pulse }],
-            opacity: isRecording ? 0.28 : 0,
-            backgroundColor: theme.colors.error,
-          },
-        ]}
-      />
-
       {/* Mic button — MD3 TouchableRipple */}
       <TouchableRipple
         onPress={handlePress}
@@ -201,12 +200,14 @@ export default function VoiceRecorder({ onTranscript, onError }: VoiceRecorderPr
           {isProcessing ? (
             <ActivityIndicator color={theme.colors.onPrimary} size={40} />
           ) : (
+            <Animated.View style={animatedMicStyle}>
             <Avatar.Icon
-              size={iconSize}
+              size={micSize}
               icon={isRecording ? 'stop' : 'microphone'}
               color={theme.colors.onPrimary}
               style={{ backgroundColor: 'transparent' }}
             />
+          </Animated.View>
           )}
         </View>
       </TouchableRipple>

@@ -21,12 +21,13 @@ import Tts from 'react-native-tts';
 import { RootStackParamList } from '../../App';
 import { SCHEMES } from '../constants/schemes';
 import { useAppContext } from '../context/AppContext';
+import { Alert } from 'react-native';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'SchemeDetail'>;
 
 export default function SchemeDetailScreen({ navigation, route }: Props) {
   const { schemeId } = route.params;
-  const { language } = useAppContext();
+  const { language, history, updateHistory } = useAppContext();
   const theme = useTheme();
   const { width: screenWidth } = useWindowDimensions();
   const isLargeScreen = screenWidth > 600;
@@ -53,10 +54,21 @@ export default function SchemeDetailScreen({ navigation, route }: Props) {
     Tts.speak(description);
   };
 
-  const handleApply = () => {
-    if (scheme.apply_url) {
-      Linking.openURL(scheme.apply_url);
     }
+  };
+
+  const isFavorite = history.eligibleSchemes.includes(schemeId);
+
+  const toggleFavorite = () => {
+    let newList = [...history.eligibleSchemes];
+    if (isFavorite) {
+      newList = newList.filter(id => id !== schemeId);
+      Alert.alert(isKan ? 'ತೆಗೆದುಹಾಕಲಾಗಿದೆ' : 'Removed', isKan ? 'ಯೋಜನೆಯನ್ನು ಮೆಚ್ಚಿನವುಗಳಿಂದ ತೆಗೆದುಹಾಕಲಾಗಿದೆ' : 'Scheme removed from favorites');
+    } else {
+      newList.push(schemeId);
+      Alert.alert(isKan ? 'ಸೇರಿಸಲಾಗಿದೆ' : 'Saved', isKan ? 'ಯೋಜನೆಯನ್ನು ಮೆಚ್ಚಿನವುಗಳಿಗೆ ಸೇರಿಸಲಾಗಿದೆ' : 'Scheme saved to your favorites');
+    }
+    updateHistory({ eligibleSchemes: newList });
   };
 
   return (
@@ -69,6 +81,11 @@ export default function SchemeDetailScreen({ navigation, route }: Props) {
         <Appbar.Content
           title={name}
           titleStyle={[styles.headerTitle, { color: theme.colors.onPrimary }]}
+        />
+        <Appbar.Action 
+          icon={isFavorite ? "heart" : "heart-outline"} 
+          color={isFavorite ? "#FF5252" : theme.colors.onPrimary} 
+          onPress={toggleFavorite} 
         />
       </Appbar.Header>
 

@@ -11,7 +11,10 @@ import {
   Avatar,
   Surface,
   ActivityIndicator,
+  IconButton,
 } from 'react-native-paper';
+import LinearGradient from 'react-native-linear-gradient';
+import Animated, { FadeInUp, Layout } from 'react-native-reanimated';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import Tts from 'react-native-tts';
 import { RootStackParamList } from '../../App';
@@ -27,19 +30,20 @@ interface Message {
 }
 
 export default function VoiceQueryScreen({ navigation }: Props) {
-  const { language, backendUrl, answers } = useAppContext();
+  const { language, backendUrl, answers, chatHistory, addChatMessage, clearChatHistory } = useAppContext();
   const theme = useTheme();
-  const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<ScrollView>(null);
   const isKan = language === 'kannada';
 
   useEffect(() => {
-    const greeting = isKan
-      ? 'ನಮಸ್ಕಾರ! ನೀವು ಯಾವುದೇ ಕೃಷಿ ಅಥವಾ ಸರ್ಕಾರಿ ಯೋಜನೆಯ ಬಗ್ಗೆ ಕೇಳಬಹುದು.'
-      : 'Hello! You can ask me about any agricultural or government scheme.';
-    setMessages([{ id: 'init', role: 'ai', text: greeting }]);
-    speak(greeting);
+    if (chatHistory.length === 0) {
+      const greeting = isKan
+        ? 'ನಮಸ್ಕಾರ! ನೀವು ಯಾವುದೇ ಕೃಷಿ ಅಥವಾ ಸರ್ಕಾರಿ ಯೋಜನೆಯ ಬಗ್ಗೆ ಕೇಳಬಹುದು.'
+        : 'Hello! You can ask me about any agricultural or government scheme.';
+      addChatMessage({ role: 'assistant', content: greeting });
+      speak(greeting);
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -49,9 +53,8 @@ export default function VoiceQueryScreen({ navigation }: Props) {
     Tts.speak(text);
   };
 
-  const handleTranscript = async (text: string) => {
-    const userMsg: Message = { id: Date.now().toString(), role: 'user', text };
-    setMessages(prev => [...prev, userMsg]);
+    const userMsg: ChatMessage = { role: 'user', content: text };
+    addChatMessage(userMsg);
     setIsLoading(true);
 
     try {
@@ -60,6 +63,7 @@ export default function VoiceQueryScreen({ navigation }: Props) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           query: text,
+          history: chatHistory.slice(-6), // Send last 6 messages for context
           user_profile: {
             is_farmer: answers.is_farmer,
             has_aadhaar: answers.has_aadhaar,
@@ -70,18 +74,17 @@ export default function VoiceQueryScreen({ navigation }: Props) {
       });
 
       const data = await response.json();
-      const aiMsg: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'ai',
-        text: data.answer,
+      const aiMsg: ChatMessage = {
+        role: 'assistant',
+        content: data.answer,
       };
-      setMessages(prev => [...prev, aiMsg]);
+      addChatMessage(aiMsg);
       speak(data.answer);
     } catch {
       const errorMsg = isKan
         ? 'ಕ್ಷಮಿಸಿ, ಸರ್ವರ್‌ಗೆ ಸಂಪರ್ಕಿಸಲು ಸಾಧ್ಯವಾಗುತ್ತಿಲ್ಲ.'
         : 'Sorry, I could not connect to the server.';
-      setMessages(prev => [...prev, { id: 'err', role: 'ai', text: errorMsg }]);
+      addChatMessage({ role: 'assistant', content: errorMsg });
       speak(errorMsg);
     } finally {
       setIsLoading(false);
@@ -100,6 +103,7 @@ export default function VoiceQueryScreen({ navigation }: Props) {
           title={isKan ? 'ಕಿಸಾನ್ ಸಹಾಯ' : 'Kisan Help'}
           titleStyle={[styles.headerTitle, { color: theme.colors.onPrimary }]}
         />
+        <Appbar.Action icon="delete-sweep" color={theme.colors.onPrimary} onPress={clearChatHistory} />
       </Appbar.Header>
 
       <ScrollView
@@ -110,28 +114,36 @@ export default function VoiceQueryScreen({ navigation }: Props) {
           scrollRef.current?.scrollToEnd({ animated: true })
         }
       >
-        {messages.map(m => (
-          <View
-            key={m.id}
+        {chatHistory.map((m, idx) => (
+          <Animated.View
+            key={idx}
+            entering={FadeInUp.delay(idx * 100)}
+            layout={Layout.springify()}
             style={[
-              styles.bubble,
-              m.role === 'user'
-                ? [styles.userBubble, { backgroundColor: theme.colors.primary }]
-                : [styles.aiBubble, { backgroundColor: theme.colors.surface }],
+              styles.bubbleContainer,
+              m.role === 'user' ? styles.userContainer : styles.aiContainer,
             ]}
           >
-            {m.role === 'ai' && (
+            {m.role === 'assistant' && (
               <Avatar.Icon
-                size={32}
+                size={36}
                 icon="robot"
-                style={{
-                  marginRight: 8,
-                  backgroundColor: theme.colors.primaryContainer,
-                }}
+                style={[styles.aiAvatar, { backgroundColor: theme.colors.primaryContainer }]}
                 color={theme.colors.onPrimaryContainer}
               />
             )}
-            <View style={{ flex: 1 }}>
+            
+            <LinearGradient
+              colors={
+                m.role === 'user'
+                  ? [theme.colors.primary, theme.colors.primary]
+                  : [theme.colors.surface, theme.colors.surfaceVariant]
+              }
+              style={[
+                styles.bubble,
+                m.role === 'user' ? styles.userBubble : styles.aiBubble,
+              ]}
+            >
               <Text
                 variant="bodyLarge"
                 style={[
@@ -142,13 +154,12 @@ export default function VoiceQueryScreen({ navigation }: Props) {
                         ? theme.colors.onPrimary
                         : theme.colors.onSurface,
                   },
-                  m.role === 'user' && { fontWeight: '700' },
                 ]}
               >
-                {m.text}
+                {m.content}
               </Text>
-            </View>
-          </View>
+            </LinearGradient>
+          </Animated.View>
         ))}
 
         {isLoading && (
@@ -188,22 +199,37 @@ const styles = StyleSheet.create({
   safe: { flex: 1 },
   headerTitle: { fontWeight: '800' },
   chatArea: { flex: 1 },
-  chatContent: { padding: 16, paddingBottom: 32 },
-  bubble: {
-    padding: 16,
-    borderRadius: 24,
-    marginVertical: 8,
-    maxWidth: '90%',
+  chatContent: { padding: 16, paddingBottom: 40 },
+  bubbleContainer: {
+    marginVertical: 10,
     flexDirection: 'row',
-    alignItems: 'flex-start',
-    elevation: 1,
+    alignItems: 'flex-end',
+  },
+  userContainer: {
+    justifyContent: 'flex-end',
+  },
+  aiContainer: {
+    justifyContent: 'flex-start',
+  },
+  aiAvatar: {
+    marginRight: 8,
+    marginBottom: 4,
+  },
+  bubble: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 20,
+    maxWidth: '80%',
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
   aiBubble: {
-    alignSelf: 'flex-start',
     borderBottomLeftRadius: 4,
   },
   userBubble: {
-    alignSelf: 'flex-end',
     borderBottomRightRadius: 4,
   },
   bubbleText: { lineHeight: 24 },

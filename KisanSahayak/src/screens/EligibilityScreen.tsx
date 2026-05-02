@@ -26,7 +26,7 @@ type Step = 'farmer' | 'aadhaar' | 'woman' | 'loading';
 
 export default function EligibilityScreen({ navigation, route }: Props) {
   const { category } = route.params;
-  const { language, setAnswer, backendUrl } = useAppContext();
+  const { language, setAnswer, backendUrl, updateHistory } = useAppContext();
   const theme = useTheme();
   const { width: screenWidth } = useWindowDimensions();
   const isLargeScreen = screenWidth > 600;
@@ -84,6 +84,7 @@ export default function EligibilityScreen({ navigation, route }: Props) {
     } catch {
       schemeIds = getEligibleSchemes(farmer, aadhaar, woman).map(s => s.id);
     }
+    updateHistory({ eligibleSchemes: schemeIds });
     navigation.replace('SchemeList', { schemeIds });
   };
 
