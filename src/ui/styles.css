@@ -1,0 +1,366 @@
+:root {
+  --bg: #f6fbf6;
+  --card: #ffffff;
+  --text: #0f172a;
+  --muted: #475569;
+  --green: #15803d;
+  --green-2: #16a34a;
+  --purple: #6d28d9;
+  --danger: #dc2626;
+  --shadow: 0 10px 25px rgba(2, 6, 23, 0.08);
+  --radius: 18px;
+  --tap: 54px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial,
+    "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+  color: var(--text);
+  background: linear-gradient(180deg, #eef7ef 0%, #ffffff 45%, #f5fbff 100%);
+}
+
+button,
+input {
+  font: inherit;
+}
+
+.appShell {
+  min-height: 100%;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+}
+
+.phone {
+  width: min(420px, 100%);
+  background: var(--card);
+  border-radius: 28px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.topBar {
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+  background: #ffffff;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 800;
+}
+
+.brandDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, var(--green-2), var(--green));
+}
+
+.pill {
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  background: #fff;
+  border-radius: 999px;
+  padding: 8px 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.screen {
+  padding: 18px 16px 18px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 900;
+  margin: 6px 0 6px;
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  margin: 0 0 16px;
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 6px 18px rgba(2, 6, 23, 0.06);
+}
+
+.stack {
+  display: grid;
+  gap: 12px;
+}
+
+.bigButton {
+  width: 100%;
+  min-height: var(--tap);
+  border-radius: 16px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  background: #fff;
+  padding: 14px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.bigButton:active {
+  transform: translateY(1px);
+}
+
+.primary {
+  border-color: rgba(21, 128, 61, 0.25);
+  background: linear-gradient(180deg, #eaffee 0%, #f3fff6 100%);
+}
+
+.primary .rightChevron {
+  color: var(--green);
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.optionBtn {
+  min-height: var(--tap);
+  border-radius: 16px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  background: #fff;
+  padding: 14px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.optionBtnYes {
+  border-color: rgba(21, 128, 61, 0.3);
+  background: linear-gradient(180deg, #eaffee 0%, #ffffff 100%);
+}
+
+.optionBtnNo {
+  border-color: rgba(220, 38, 38, 0.25);
+  background: linear-gradient(180deg, #fff1f1 0%, #ffffff 100%);
+}
+
+.progressRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.stepBadge {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  background: #eef7ef;
+  color: var(--green);
+  border: 1px solid rgba(21, 128, 61, 0.2);
+}
+
+.progressTrack {
+  flex: 1;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.08);
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--green-2), var(--green));
+  width: 0%;
+}
+
+.listenRow {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.listenBtn {
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  background: #fff;
+  border-radius: 14px;
+  padding: 10px 14px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.heroMic {
+  width: 140px;
+  height: 140px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  margin: 18px auto 8px;
+  border: 10px solid rgba(21, 128, 61, 0.12);
+  background: radial-gradient(circle at 30% 30%, #d9ffe7, #ffffff 58%);
+}
+
+.micBtn {
+  width: 96px;
+  height: 96px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  color: #fff;
+  background: radial-gradient(circle at 30% 30%, #22c55e, #15803d);
+  display: grid;
+  place-items: center;
+  box-shadow: 0 16px 35px rgba(21, 128, 61, 0.35);
+}
+
+.micBtn:active {
+  transform: translateY(1px);
+}
+
+.notice {
+  background: rgba(109, 40, 217, 0.08);
+  border: 1px solid rgba(109, 40, 217, 0.18);
+  color: #3b1b9a;
+  border-radius: 14px;
+  padding: 12px 12px;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.cameraWrap {
+  border-radius: 22px;
+  overflow: hidden;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  background: #0b1220;
+  position: relative;
+  aspect-ratio: 9 / 16;
+  width: 100%;
+}
+
+.cameraVideo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.92;
+}
+
+.cameraOverlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.scanCircle {
+  width: 210px;
+  height: 210px;
+  border-radius: 999px;
+  border: 3px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 0 0 10px rgba(255, 255, 255, 0.08);
+}
+
+.cameraFooter {
+  margin-top: 12px;
+  display: grid;
+  gap: 10px;
+}
+
+.actionBtn {
+  width: 100%;
+  min-height: var(--tap);
+  border-radius: 16px;
+  border: none;
+  cursor: pointer;
+  font-weight: 900;
+  background: linear-gradient(180deg, var(--green-2), var(--green));
+  color: #fff;
+}
+
+.actionBtnSecondary {
+  background: linear-gradient(180deg, #dbeafe, #eff6ff);
+  color: #1e3a8a;
+  border: 1px solid rgba(30, 58, 138, 0.18);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.toggleBtn {
+  min-height: 46px;
+  border-radius: 14px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  background: #fff;
+  padding: 10px 12px;
+  cursor: pointer;
+  font-weight: 800;
+  flex: 1;
+}
+
+.toggleBtnOn {
+  border-color: rgba(21, 128, 61, 0.3);
+  background: rgba(34, 197, 94, 0.12);
+}
+
+.footerBar {
+  border-top: 1px solid rgba(15, 23, 42, 0.06);
+  padding: 12px 12px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  background: #ffffff;
+}
+
+.navBtn {
+  min-height: 44px;
+  border-radius: 14px;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  background: #fff;
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.navBtnActive {
+  border-color: rgba(21, 128, 61, 0.25);
+  background: rgba(34, 197, 94, 0.1);
+  color: #0b4b24;
+}
+

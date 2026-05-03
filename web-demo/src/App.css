@@ -1,0 +1,240 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Outfit:wght@400;600;800&display=swap');
+
+:root {
+  --primary: #2D5A27;
+  --secondary: #E9C46A;
+  --accent: #2A9D8F;
+  --background: #0F1711;
+  --card-bg: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --text: #F8F9FA;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--background);
+  color: var(--text);
+  overflow-x: hidden;
+}
+
+h1, h2, h3 {
+  font-family: 'Outfit', sans-serif;
+}
+
+.app-container {
+  min-height: 100vh;
+  background: radial-gradient(circle at top right, #1a3c1e, #0f1711);
+  display: flex;
+  flex-direction: column;
+}
+
+.navbar {
+  padding: 1.5rem 5%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--glass-border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--secondary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.hero {
+  padding: 4rem 5%;
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 4rem;
+  align-items: center;
+}
+
+.hero-content h1 {
+  font-size: 4rem;
+  line-height: 1.1;
+  margin-bottom: 1.5rem;
+  background: linear-gradient(to right, #fff, var(--secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero-content p {
+  font-size: 1.25rem;
+  color: #a0a0a0;
+  margin-bottom: 2.5rem;
+  max-width: 600px;
+}
+
+.cta-group {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.btn {
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: var(--secondary);
+  color: #000;
+  border: none;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(233, 196, 106, 0.2);
+}
+
+.btn-outline {
+  background: transparent;
+  color: #fff;
+  border: 1px solid var(--glass-border);
+}
+
+.hero-image-container {
+  position: relative;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+  border: 1px solid var(--glass-border);
+}
+
+.hero-image {
+  width: 100%;
+  display: block;
+}
+
+.mockup-section {
+  padding: 6rem 5%;
+  text-align: center;
+}
+
+.mockup-grid {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-top: 4rem;
+}
+
+.phone-mockup {
+  width: 320px;
+  height: 640px;
+  background: #000;
+  border-radius: 40px;
+  border: 8px solid #333;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 50px 100px rgba(0,0,0,0.6);
+}
+
+.app-screen {
+  width: 100%;
+  height: 100%;
+  background: #121212;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  padding: 2rem 1.5rem;
+  text-align: left;
+}
+
+.robot-head {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.waves {
+  height: 30px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin: 1rem 0;
+}
+
+.wave-bar {
+  width: 3px;
+  height: 10px;
+  background: var(--secondary);
+  border-radius: 3px;
+  animation: pulse 1s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0%, 100% { height: 10px; }
+  50% { height: 25px; }
+}
+
+.option-btn {
+  background: var(--card-bg);
+  border: 1px solid var(--glass-border);
+  padding: 1.25rem;
+  border-radius: 16px;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.option-btn:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+.features {
+  padding: 6rem 5%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+}
+
+.feature-card {
+  background: var(--card-bg);
+  padding: 2.5rem;
+  border-radius: 24px;
+  border: 1px solid var(--glass-border);
+  transition: all 0.3s ease;
+}
+
+.feature-card:hover {
+  background: rgba(255,255,255,0.08);
+  border-color: var(--secondary);
+}
+
+.icon-box {
+  width: 50px;
+  height: 50px;
+  background: rgba(233, 196, 106, 0.1);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--secondary);
+  margin-bottom: 1.5rem;
+}
+
+footer {
+  padding: 4rem 5%;
+  border-top: 1px solid var(--glass-border);
+  text-align: center;
+  color: #666;
+}
