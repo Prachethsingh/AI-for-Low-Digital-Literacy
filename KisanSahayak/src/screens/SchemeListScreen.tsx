@@ -4,7 +4,7 @@
  */
 import React from 'react';
 import { View, StyleSheet, SafeAreaView, FlatList, useWindowDimensions } from 'react-native';
-import { Text, Button, useTheme, Surface, Avatar } from 'react-native-paper';
+import { Text, Button, useTheme, Surface, Avatar, Searchbar } from 'react-native-paper';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../App';
 import { SCHEMES } from '../constants/schemes';
@@ -26,8 +26,15 @@ export default function SchemeListScreen({ navigation, route }: Props) {
 
   const isKan = language === 'kannada';
 
-  const filtered =
-    schemeIds.length > 0 ? SCHEMES.filter(s => schemeIds.includes(s.id)) : SCHEMES;
+  const [searchQuery, setSearchQuery] = React.useState('');
+
+  const filtered = (schemeIds.length > 0 
+    ? SCHEMES.filter(s => schemeIds.includes(s.id)) 
+    : SCHEMES
+  ).filter(s => {
+    const name = isKan ? s.name_kn : s.name_en;
+    return name.toLowerCase().includes(searchQuery.toLowerCase());
+  });
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]}>
@@ -60,6 +67,12 @@ export default function SchemeListScreen({ navigation, route }: Props) {
             >
               {isKan ? 'ನಿಮಗಾಗಿ ಯೋಜನೆಗಳು' : 'Schemes for You'}
             </Text>
+            <Searchbar
+              placeholder={isKan ? 'ಹುಡುಕಿ...' : 'Search schemes...'}
+              onChangeText={setSearchQuery}
+              value={searchQuery}
+              style={styles.searchBar}
+            />
             <Text
               variant="bodyMedium"
               style={[styles.subtitle, { color: theme.colors.onSurfaceVariant }]}
@@ -118,7 +131,8 @@ const styles = StyleSheet.create({
   },
   headerInfo: { paddingVertical: 24 },
   title: { fontWeight: '900' },
-  subtitle: { marginTop: 4 },
+  searchBar: { marginTop: 16, borderRadius: 12, backgroundColor: 'rgba(0,0,0,0.02)' },
+  subtitle: { marginTop: 12 },
   list: { paddingBottom: 40 },
   empty: {
     alignItems: 'center',

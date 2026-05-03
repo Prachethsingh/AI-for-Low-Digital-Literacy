@@ -10,7 +10,7 @@ import { Text, Card, IconButton, Button, useTheme, Surface } from 'react-native-
 import { RootStackParamList } from '../../App';
 import { useAppContext } from '../context/AppContext';
 import { FLOWS } from '../constants/flows';
-import Tts from 'react-native-tts';
+import { AudioController } from '../utils/AudioController';
 import VoiceRecorder from '../components/VoiceRecorder';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'Welcome'>;
@@ -31,9 +31,8 @@ export default function WelcomeScreen() {
   const subGreeting = isKan ? 'ನಾನು ನಿಮಗೆ ಹೇಗೆ ಸಹಾಯ ಮಾಡಬಲ್ಲೆ?' : 'How can I help you?';
 
   useEffect(() => {
-    Tts.setDefaultLanguage('hi-IN');
-    Tts.speak(`${greeting} ${subGreeting}`);
-  }, [greeting, subGreeting]);
+    AudioController.speak(`${greeting} ${subGreeting}`, language);
+  }, [greeting, subGreeting, language]);
 
   const handleSelect = (flowId: string) => {
     navigation.navigate('Question', { flowId, step: 0 });

@@ -30,7 +30,7 @@ import {
 import { RootStackParamList } from '../../App';
 import { useAppContext } from '../context/AppContext';
 import { FLOWS } from '../constants/flows';
-import Tts from 'react-native-tts';
+import { AudioController } from '../utils/AudioController';
 import { launchCamera } from 'react-native-image-picker';
 import VoiceRecorder from '../components/VoiceRecorder';
 
@@ -41,7 +41,7 @@ export default function QuestionScreen() {
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute<RouteType>();
   const { flowId, step } = route.params;
-  const { language, backendUrl } = useAppContext();
+  const { language, backendUrl, userProfile, setUserProfile } = useAppContext();
   const theme = useTheme();
 
   const flow = FLOWS[flowId];
@@ -61,9 +61,8 @@ export default function QuestionScreen() {
   const progress = (step + 1) / flow.questions.length;
 
   useEffect(() => {
-    Tts.setDefaultLanguage('hi-IN');
-    Tts.speak(questionText);
-  }, [questionText]);
+    AudioController.speak(questionText, language);
+  }, [questionText, language]);
 
   const handleNext = () => {
     if (step < flow.questions.length - 1) {
@@ -138,15 +137,19 @@ export default function QuestionScreen() {
       const resp = await fetch(`${backendUrl}/ocr`, {
         method: 'POST',
         body: formData,
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
       });
 
       const data = await resp.json();
       const message = data.text || (isKan ? 'ದಾಖಲೆ ಯಶಸ್ವಿಯಾಗಿ ಸೆರೆಹಿಡಿಯಲಾಗಿದೆ.' : 'Document captured successfully.');
       setOcrResult(message);
-      Tts.speak(message);
+      AudioController.speak(message, language);
+
+      // Update global profile if OCR returned a specific document type
+      if (data.type === 'aadhaar' && userProfile) {
+        setUserProfile({ ...userProfile, aadhaar: data.text.split(': ')[1] || 'Verified' });
+      } else if (data.type === 'pan' && userProfile) {
+        setUserProfile({ ...userProfile, pan: data.text.split(': ')[1] || 'Verified' });
+      }
       
       // Wait a bit for user to see result then go next
       setTimeout(() => {

@@ -1,258 +1,217 @@
-/**
- * SchemeDetailScreen — full scheme info with audio, apply button.
- * MD3: Appbar, Card, Button, Avatar, Surface, Divider, TouchableRipple.
- * No hardcoded hex — uses theme.colors tokens everywhere.
- */
 import React from 'react';
-import { View, StyleSheet, SafeAreaView, ScrollView, Linking, useWindowDimensions } from 'react-native';
-import {
-  Text,
-  Button,
-  useTheme,
-  Appbar,
-  Card,
-  Avatar,
-  Surface,
-  Divider,
-  TouchableRipple,
-} from 'react-native-paper';
+import { View, StyleSheet, ScrollView, SafeAreaView, Linking } from 'react-native';
+import { Text, Button, IconButton, useTheme, Card, Avatar, List, Divider } from 'react-native-paper';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import Tts from 'react-native-tts';
 import { RootStackParamList } from '../../App';
 import { SCHEMES } from '../constants/schemes';
 import { useAppContext } from '../context/AppContext';
-import { Alert } from 'react-native';
+import NeumorphicView from '../components/NeumorphicView';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'SchemeDetail'>;
 
-export default function SchemeDetailScreen({ navigation, route }: Props) {
+export default function SchemeDetailScreen({ route, navigation }: Props) {
   const { schemeId } = route.params;
-  const { language, history, updateHistory } = useAppContext();
+  const { language } = useAppContext();
   const theme = useTheme();
-  const { width: screenWidth } = useWindowDimensions();
-  const isLargeScreen = screenWidth > 600;
-
-  const bannerPadding = isLargeScreen ? 48 : 32;
-  const bannerIconSize = isLargeScreen ? 'displayLarge' : 'displayMedium';
-  const audioBarMargin = isLargeScreen ? 32 : 20;
-  const applyBtnHeight = isLargeScreen ? 80 : 64;
-  const applyBtnFont = isLargeScreen ? 24 : 20;
+  const isKan = language === 'kannada';
 
   const scheme = SCHEMES.find(s => s.id === schemeId);
 
   if (!scheme) {
-    return null;
+    return (
+      <View style={styles.error}>
+        <Text>Scheme not found</Text>
+      </View>
+    );
   }
 
-  const isKan = language === 'kannada';
-  const name = isKan ? scheme.name_kn : scheme.name_en;
-  const description = isKan ? scheme.description_kn : scheme.description_en;
-
-  const playAudio = () => {
-    Tts.stop();
-    Tts.setDefaultLanguage(isKan ? 'kn-IN' : 'en-IN');
-    Tts.speak(description);
+  const handleApply = () => {
+    Linking.openURL(scheme.apply_url);
   };
 
-    }
-  };
-
-  const isFavorite = history.eligibleSchemes.includes(schemeId);
-
-  const toggleFavorite = () => {
-    let newList = [...history.eligibleSchemes];
-    if (isFavorite) {
-      newList = newList.filter(id => id !== schemeId);
-      Alert.alert(isKan ? 'ತೆಗೆದುಹಾಕಲಾಗಿದೆ' : 'Removed', isKan ? 'ಯೋಜನೆಯನ್ನು ಮೆಚ್ಚಿನವುಗಳಿಂದ ತೆಗೆದುಹಾಕಲಾಗಿದೆ' : 'Scheme removed from favorites');
-    } else {
-      newList.push(schemeId);
-      Alert.alert(isKan ? 'ಸೇರಿಸಲಾಗಿದೆ' : 'Saved', isKan ? 'ಯೋಜನೆಯನ್ನು ಮೆಚ್ಚಿನವುಗಳಿಗೆ ಸೇರಿಸಲಾಗಿದೆ' : 'Scheme saved to your favorites');
-    }
-    updateHistory({ eligibleSchemes: newList });
+  const handleCall = () => {
+    Linking.openURL(`tel:${scheme.helpline}`);
   };
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]}>
-      <Appbar.Header style={{ backgroundColor: theme.colors.primary }}>
-        <Appbar.BackAction
-          onPress={() => navigation.goBack()}
-          color={theme.colors.onPrimary}
-        />
-        <Appbar.Content
-          title={name}
-          titleStyle={[styles.headerTitle, { color: theme.colors.onPrimary }]}
-        />
-        <Appbar.Action 
-          icon={isFavorite ? "heart" : "heart-outline"} 
-          color={isFavorite ? "#FF5252" : theme.colors.onPrimary} 
-          onPress={toggleFavorite} 
-        />
-      </Appbar.Header>
-
-      <ScrollView contentContainerStyle={styles.content}>
-        {/* Scheme banner */}
-        <Surface
-          style={[styles.banner, { backgroundColor: scheme.color, padding: bannerPadding }]}
-          elevation={2}
-        >
-          <Text variant={bannerIconSize} style={styles.bannerIcon}>
-            {scheme.icon}
-          </Text>
-          <Text variant="headlineMedium" style={[styles.bannerName, { color: theme.colors.surface }]}>
-            {name}
-          </Text>
-        </Surface>
-
-        {/* Audio assistant bar */}
-        <TouchableRipple
-          onPress={playAudio}
-          style={[styles.audioBarRipple, { marginHorizontal: audioBarMargin }]}
-          rippleColor="rgba(255,255,255,0.2)"
-        >
-          <Surface
-            style={[styles.audioBar, { backgroundColor: theme.colors.tertiary }]}
-            elevation={4}
-          >
-            <Avatar.Icon
-              size={isLargeScreen ? 50 : 40}
-              icon="volume-high"
-              style={{ backgroundColor: 'transparent' }}
-              color={theme.colors.onTertiary}
+      <ScrollView showsVerticalScrollIndicator={false}>
+        {/* Hero Section */}
+        <View style={[styles.hero, { backgroundColor: scheme.color }]}>
+          <View style={styles.heroHeader}>
+            <IconButton 
+              icon="chevron-left" 
+              iconColor="white" 
+              onPress={() => navigation.goBack()} 
             />
-            <Text
-              variant="titleMedium"
-              style={[styles.audioText, { color: theme.colors.onTertiary }]}
-            >
-              {isKan ? 'ಮಾಹಿತಿ ಕೇಳಲು ಒತ್ತಿ' : 'Tap to hear info'}
+            <IconButton 
+              icon="share-variant" 
+              iconColor="white" 
+              onPress={() => {}} 
+            />
+          </View>
+          <View style={styles.heroContent}>
+            <Text style={styles.heroIcon}>{scheme.icon}</Text>
+            <Text variant="headlineMedium" style={styles.heroTitle}>
+              {isKan ? scheme.name_kn : scheme.name_en}
             </Text>
-          </Surface>
-        </TouchableRipple>
+            <Text variant="titleMedium" style={styles.heroTagline}>
+              {isKan ? scheme.tagline_kn : scheme.tagline_en}
+            </Text>
+          </View>
+        </View>
 
-        {/* Detail card */}
-        <Card style={styles.detailsCard} mode="elevated">
-          <Card.Content>
-            <Text
-              variant="titleLarge"
-              style={[styles.sectionTitle, { color: theme.colors.primary }]}
-            >
-              {isKan ? 'ಯೋಜನೆಯ ವಿವರ' : 'Scheme Details'}
-            </Text>
-            <Divider style={styles.divider} />
-            <Text
-              variant="bodyLarge"
-              style={[styles.description, { color: theme.colors.onSurface }]}
-            >
-              {description}
-            </Text>
-
-            <Surface
-              style={[styles.infoGrid, { backgroundColor: theme.colors.surfaceVariant }]}
-              elevation={0}
-            >
-              <View style={styles.infoItem}>
-                <Text
-                  variant="labelSmall"
-                  style={[styles.infoLabel, { color: theme.colors.onSurfaceVariant }]}
-                >
-                  {isKan ? 'ಸಹಾಯವಾಣಿ' : 'Helpline'}
+        <View style={styles.body}>
+          {/* Eligibility Badge */}
+          <NeumorphicView style={styles.eligibilityCard}>
+            <View style={styles.row}>
+              <Avatar.Icon size={40} icon="check-decagram" style={{ backgroundColor: theme.colors.primaryContainer }} color={theme.colors.onPrimaryContainer} />
+              <View style={{ marginLeft: 12 }}>
+                <Text variant="titleMedium" style={{ fontWeight: 'bold' }}>
+                  {isKan ? 'ನೀವು ಅರ್ಹರಾಗಿದ್ದೀರಿ' : 'You are Eligible'}
                 </Text>
-                <Button
-                  mode="text"
-                  onPress={() => Linking.openURL(`tel:${scheme.helpline}`)}
-                  icon="phone"
-                  style={{ alignSelf: 'flex-start' }}
-                  textColor={theme.colors.primary}
-                >
-                  {scheme.helpline}
-                </Button>
+                <Text variant="bodySmall">
+                  {isKan ? 'ಸಿಸ್ಟಮ್ ಪರಿಶೀಲಿಸಿದಂತೆ' : 'Verified by system checks'}
+                </Text>
               </View>
-            </Surface>
-          </Card.Content>
-        </Card>
+            </View>
+          </NeumorphicView>
 
-        {/* Apply CTA */}
-        <Button
-          mode="contained"
-          onPress={handleApply}
-          style={[styles.applyBtn, { backgroundColor: scheme.color }]}
-          contentStyle={[styles.applyContent, { height: applyBtnHeight }]}
-          labelStyle={[styles.applyLabel, { fontSize: applyBtnFont }]}
-          icon="launch"
-        >
-          {isKan ? 'ಅರ್ಜಿ ಸಲ್ಲಿಸಿ' : 'Apply Now'}
-        </Button>
-        <Text
-          variant="labelSmall"
-          style={[styles.urlHint, { color: theme.colors.onSurfaceVariant }]}
-        >
-          {scheme.apply_url.replace('https://', '')}
-        </Text>
+          {/* Description */}
+          <View style={styles.section}>
+            <Text variant="titleLarge" style={styles.sectionTitle}>
+              {isKan ? 'ಯೋಜನೆಯ ಬಗ್ಗೆ' : 'About the Scheme'}
+            </Text>
+            <Text variant="bodyLarge" style={styles.description}>
+              {isKan ? scheme.description_kn : scheme.description_en}
+            </Text>
+          </View>
+
+          <Divider style={styles.divider} />
+
+          {/* Requirements */}
+          <View style={styles.section}>
+            <Text variant="titleLarge" style={styles.sectionTitle}>
+              {isKan ? 'ಅಗತ್ಯ ದಾಖಲೆಗಳು' : 'Requirements'}
+            </Text>
+            <List.Item
+              title={isKan ? 'ಆಧಾರ್ ಕಾರ್ಡ್' : 'Aadhaar Card'}
+              left={props => <List.Icon {...props} icon={scheme.requires_aadhaar ? "check-circle" : "information-outline"} color={scheme.requires_aadhaar ? theme.colors.primary : theme.colors.outline} />}
+            />
+            <List.Item
+              title={isKan ? 'ರೈತ ದೃಢೀಕರಣ' : 'Farmer Status'}
+              left={props => <List.Icon {...props} icon={scheme.requires_farmer ? "check-circle" : "information-outline"} color={scheme.requires_farmer ? theme.colors.primary : theme.colors.outline} />}
+            />
+          </View>
+
+          {/* Contact */}
+          <View style={styles.section}>
+            <Text variant="titleLarge" style={styles.sectionTitle}>
+              {isKan ? 'ಸಹಾಯಕ್ಕಾಗಿ ಸಂಪರ್ಕಿಸಿ' : 'Contact Support'}
+            </Text>
+            <Card mode="contained" style={styles.contactCard} onPress={handleCall}>
+              <Card.Title
+                title={scheme.helpline}
+                subtitle={isKan ? 'ಸಹಾಯವಾಣಿ ಸಂಖ್ಯೆ' : 'Helpline Number'}
+                left={props => <Avatar.Icon {...props} icon="phone" />}
+              />
+            </Card>
+          </View>
+        </View>
       </ScrollView>
+
+      {/* Fixed Footer */}
+      <View style={[styles.footer, { backgroundColor: theme.colors.surface }]}>
+        <Button 
+          mode="contained" 
+          onPress={handleApply} 
+          style={styles.applyBtn}
+          contentStyle={{ height: 56 }}
+          labelStyle={{ fontSize: 18, fontWeight: 'bold' }}
+        >
+          {isKan ? 'ಈಗಲೇ ಅರ್ಜಿ ಸಲ್ಲಿಸಿ' : 'Apply Now'}
+        </Button>
+      </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   safe: { flex: 1 },
-  headerTitle: {
-    fontWeight: '800',
-  },
-  content: { paddingBottom: 60 },
-  banner: {
-    alignItems: 'center',
+  hero: {
+    paddingTop: 16,
+    paddingBottom: 40,
     borderBottomLeftRadius: 40,
     borderBottomRightRadius: 40,
   },
-  bannerIcon: { marginBottom: 12 },
-  bannerName: {
+  heroHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 8,
+  },
+  heroContent: {
+    alignItems: 'center',
+    paddingHorizontal: 24,
+  },
+  heroIcon: {
+    fontSize: 64,
+    marginBottom: 16,
+  },
+  heroTitle: {
+    color: 'white',
     fontWeight: '900',
     textAlign: 'center',
   },
-  audioBarRipple: {
-    marginTop: -24,
-    borderRadius: 20,
+  heroTagline: {
+    color: 'rgba(255,255,255,0.8)',
+    textAlign: 'center',
+    marginTop: 8,
   },
-  audioBar: {
-    flexDirection: 'row',
+  body: {
+    paddingHorizontal: 20,
+    paddingBottom: 100,
+  },
+  eligibilityCard: {
+    marginTop: -30,
     padding: 16,
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  audioText: { fontWeight: '800', marginLeft: 8 },
-  detailsCard: {
-    margin: 20,
-    marginTop: 24,
     borderRadius: 24,
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  section: {
+    marginTop: 32,
   },
   sectionTitle: {
     fontWeight: '900',
+    marginBottom: 16,
   },
-  divider: { marginVertical: 12 },
   description: {
-    lineHeight: 28,
+    lineHeight: 26,
+    opacity: 0.8,
   },
-  infoGrid: {
-    marginTop: 24,
+  divider: {
+    marginTop: 32,
+  },
+  contactCard: {
     borderRadius: 16,
+  },
+  footer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
     padding: 16,
-  },
-  infoItem: {
-    marginVertical: 4,
-  },
-  infoLabel: {
-    textTransform: 'uppercase',
-    fontWeight: '700',
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(0,0,0,0.05)',
   },
   applyBtn: {
-    marginHorizontal: 24,
-    marginTop: 24,
-    borderRadius: 20,
+    borderRadius: 16,
   },
-  applyContent: { },
-  applyLabel: { fontWeight: '900' },
-  urlHint: {
-    textAlign: 'center',
-    marginTop: 8,
+  error: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

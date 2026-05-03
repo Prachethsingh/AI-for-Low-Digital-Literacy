@@ -16,7 +16,7 @@ import {
 import LinearGradient from 'react-native-linear-gradient';
 import Animated, { FadeInUp, Layout } from 'react-native-reanimated';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import Tts from 'react-native-tts';
+import { AudioController } from '../utils/AudioController';
 import { RootStackParamList } from '../../App';
 import { useAppContext } from '../context/AppContext';
 import VoiceRecorder from '../components/VoiceRecorder';
@@ -48,9 +48,7 @@ export default function VoiceQueryScreen({ navigation }: Props) {
   }, []);
 
   const speak = (text: string) => {
-    Tts.stop();
-    Tts.setDefaultLanguage(isKan ? 'kn-IN' : 'en-IN');
-    Tts.speak(text);
+    AudioController.speak(text, language);
   };
 
     const userMsg: ChatMessage = { role: 'user', content: text };

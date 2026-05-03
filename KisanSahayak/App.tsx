@@ -23,6 +23,7 @@ import VoiceQueryScreen from './src/screens/VoiceQueryScreen';
 import LoginScreen from './src/screens/LoginScreen';
 import DocumentVaultScreen from './src/screens/DocumentVaultScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
+import SchemeDetailScreen from './src/screens/SchemeDetailScreen';
 import { useAppContext } from './src/context/AppContext';
 
 export type RootStackParamList = {
@@ -39,6 +40,7 @@ export type RootStackParamList = {
   Login: undefined;
   DocumentVault: undefined;
   Settings: undefined;
+  SchemeDetail: { schemeId: string };
 };
 
 // ── MD3 theme: agricultural green palette ────────────────────────────────────
@@ -111,6 +113,7 @@ function NavigationStack() {
           <Stack.Screen name="Success" component={SuccessScreen} />
           <Stack.Screen name="DocumentVault" component={DocumentVaultScreen} />
           <Stack.Screen name="Settings" component={SettingsScreen} />
+          <Stack.Screen name="SchemeDetail" component={SchemeDetailScreen} />
         </>
       )}
     </Stack.Navigator>
