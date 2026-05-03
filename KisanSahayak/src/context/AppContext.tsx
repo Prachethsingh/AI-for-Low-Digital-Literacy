@@ -18,6 +18,13 @@ export interface ChatMessage {
   content: string;
 }
 
+export interface UserProfile {
+  name: string;
+  phone: string;
+  aadhaar: string;
+  pan: string;
+}
+
 export interface UserHistory {
   lastQuery: string;
   eligibleSchemes: string[];
@@ -37,6 +44,10 @@ interface AppContextType {
   clearChatHistory: () => void;
   history: UserHistory;
   updateHistory: (update: Partial<UserHistory>) => void;
+  userProfile: UserProfile | null;
+  setUserProfile: (profile: UserProfile | null) => void;
+  isLoggedIn: boolean;
+  logout: () => void;
 }
 
 const defaultAnswers: EligibilityAnswers = {
@@ -59,6 +70,10 @@ const AppContext = createContext<AppContextType>({
   clearChatHistory: () => {},
   history: { lastQuery: '', eligibleSchemes: [] },
   updateHistory: () => {},
+  userProfile: null,
+  setUserProfile: () => {},
+  isLoggedIn: false,
+  logout: () => {},
 });
 
 export function AppProvider({ children }: { children: ReactNode }) {
@@ -67,6 +82,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [backendUrl, setBackendUrl] = useState('http://10.0.2.2:8000');
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
   const [history, setHistory] = useState<UserHistory>({ lastQuery: '', eligibleSchemes: [] });
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 
   // Persistence
   useEffect(() => {
@@ -83,6 +99,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
         const savedHistory = await AsyncStorage.getItem('history');
         if (savedHistory) setHistory(JSON.parse(savedHistory));
+
+        const savedProfile = await AsyncStorage.getItem('userProfile');
+        if (savedProfile) setUserProfile(JSON.parse(savedProfile));
       } catch (e) {
         console.error('Failed to load state', e);
       }
@@ -95,7 +114,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
     AsyncStorage.setItem('answers', JSON.stringify(answers));
     AsyncStorage.setItem('chatHistory', JSON.stringify(chatHistory));
     AsyncStorage.setItem('history', JSON.stringify(history));
-  }, [language, answers, chatHistory, history]);
+    if (userProfile) {
+      AsyncStorage.setItem('userProfile', JSON.stringify(userProfile));
+    } else {
+      AsyncStorage.removeItem('userProfile');
+    }
+  }, [language, answers, chatHistory, history, userProfile]);
 
   const toggleLanguage = () =>
     setLanguage(l => (l === 'kannada' ? 'english' : 'kannada'));
@@ -113,6 +137,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const updateHistory = (update: Partial<UserHistory>) =>
     setHistory(prev => ({ ...prev, ...update }));
 
+  const logout = () => {
+    setUserProfile(null);
+    setChatHistory([]);
+    setHistory({ lastQuery: '', eligibleSchemes: [] });
+    resetAnswers();
+  };
+
+  const isLoggedIn = !!userProfile;
+
   return (
     <AppContext.Provider
       value={{
@@ -129,6 +162,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
         clearChatHistory,
         history,
         updateHistory,
+        userProfile,
+        setUserProfile,
+        isLoggedIn,
+        logout,
       }}
     >
       {children}

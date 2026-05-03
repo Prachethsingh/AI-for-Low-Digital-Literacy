@@ -27,7 +27,7 @@ export default function LanguageScreen() {
 
   const handleSelect = (lang: 'english' | 'kannada') => {
     setLanguage(lang);
-    navigation.navigate('Home');
+    navigation.navigate('Welcome');
   };
 
   return (

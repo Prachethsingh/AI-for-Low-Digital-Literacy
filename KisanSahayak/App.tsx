@@ -20,6 +20,8 @@ import EligibilityScreen from './src/screens/EligibilityScreen';
 import SchemeListScreen from './src/screens/SchemeListScreen';
 import SchemeDetailScreen from './src/screens/SchemeDetailScreen';
 import VoiceQueryScreen from './src/screens/VoiceQueryScreen';
+import LoginScreen from './src/screens/LoginScreen';
+import { useAppContext } from './src/context/AppContext';
 
 export type RootStackParamList = {
   Language: undefined;
@@ -32,6 +34,7 @@ export type RootStackParamList = {
   SchemeList: { schemeIds: string[] };
   SchemeDetail: { schemeId: string };
   VoiceQuery: undefined;
+  Login: undefined;
 };
 
 // ── MD3 theme: agricultural green palette ────────────────────────────────────
@@ -74,30 +77,46 @@ const { LightTheme: navTheme } = adaptNavigationTheme({
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
+function NavigationStack() {
+  const { isLoggedIn } = useAppContext();
+
+  return (
+    <Stack.Navigator
+      initialRouteName={isLoggedIn ? "Home" : "Language"}
+      screenOptions={{
+        headerShown: false,
+        animation: 'slide_from_right',
+        contentStyle: { backgroundColor: paperTheme.colors.background },
+      }}
+    >
+      {!isLoggedIn ? (
+        <>
+          <Stack.Screen name="Language" component={LanguageScreen} />
+          <Stack.Screen name="Welcome" component={WelcomeScreen} />
+          <Stack.Screen name="Login" component={LoginScreen} />
+        </>
+      ) : (
+        <>
+          <Stack.Screen name="Home" component={HomeScreen} />
+          <Stack.Screen name="Category" component={CategoryScreen} />
+          <Stack.Screen name="Eligibility" component={EligibilityScreen} />
+          <Stack.Screen name="SchemeList" component={SchemeListScreen} />
+          <Stack.Screen name="SchemeDetail" component={SchemeDetailScreen} />
+          <Stack.Screen name="VoiceQuery" component={VoiceQueryScreen} />
+          <Stack.Screen name="Question" component={QuestionScreen} />
+          <Stack.Screen name="Success" component={SuccessScreen} />
+        </>
+      )}
+    </Stack.Navigator>
+  );
+}
+
 export default function App(): React.JSX.Element {
   return (
     <AppProvider>
       <PaperProvider theme={paperTheme}>
         <NavigationContainer theme={navTheme}>
-          <Stack.Navigator
-            initialRouteName="Language"
-            screenOptions={{
-              headerShown: false,
-              animation: 'slide_from_right',
-              contentStyle: { backgroundColor: paperTheme.colors.background },
-            }}
-          >
-            <Stack.Screen name="Language" component={LanguageScreen} />
-            <Stack.Screen name="Welcome" component={WelcomeScreen} />
-            <Stack.Screen name="Question" component={QuestionScreen} />
-            <Stack.Screen name="Success" component={SuccessScreen} />
-            <Stack.Screen name="Home" component={HomeScreen} />
-            <Stack.Screen name="Category" component={CategoryScreen} />
-            <Stack.Screen name="Eligibility" component={EligibilityScreen} />
-            <Stack.Screen name="SchemeList" component={SchemeListScreen} />
-            <Stack.Screen name="SchemeDetail" component={SchemeDetailScreen} />
-            <Stack.Screen name="VoiceQuery" component={VoiceQueryScreen} />
-          </Stack.Navigator>
+          <NavigationStack />
         </NavigationContainer>
       </PaperProvider>
     </AppProvider>

@@ -149,6 +149,15 @@ export default function WelcomeScreen() {
           <Text variant="labelMedium" style={{ color: theme.colors.primary }}>
             ✨ Powered by AI Assistant
           </Text>
+          <Button
+            mode="contained"
+            onPress={() => navigation.navigate('Login')}
+            style={styles.getStartedBtn}
+            contentStyle={styles.getStartedContent}
+            labelStyle={styles.getStartedLabel}
+          >
+            {isKan ? 'ಪ್ರಾರಂಭಿಸಿ' : 'Get Started'}
+          </Button>
         </Surface>
       </View>
     </SafeAreaView>
@@ -213,5 +222,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 16,
     backgroundColor: 'transparent',
+  },
+  getStartedBtn: {
+    marginVertical: 16,
+    borderRadius: 16,
+  },
+  getStartedContent: {
+    paddingVertical: 8,
+  },
+  getStartedLabel: {
+    fontWeight: '900',
+    fontSize: 18,
   },
 });

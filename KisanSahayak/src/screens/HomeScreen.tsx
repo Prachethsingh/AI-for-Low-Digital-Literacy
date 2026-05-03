@@ -16,7 +16,7 @@ import LanguageToggle from '../components/LanguageToggle';
 type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
 export default function HomeScreen({ navigation }: Props) {
-  const { language, history } = useAppContext();
+  const { language, history, userProfile, logout } = useAppContext();
   const theme = useTheme();
   const { width: screenWidth } = useWindowDimensions();
   const isLargeScreen = screenWidth > 600;
@@ -41,11 +41,63 @@ export default function HomeScreen({ navigation }: Props) {
               {isKan ? 'ಸರ್ಕಾರಿ ಯೋಜನೆಗಳ ಮಾರ್ಗದರ್ಶಿ' : 'Your Guide to Government Schemes'}
             </Text>
           </View>
-          <LanguageToggle />
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <LanguageToggle />
+            <IconButton 
+              icon="logout" 
+              iconColor={theme.colors.onPrimary} 
+              onPress={logout} 
+              size={24}
+            />
+          </View>
         </View>
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
+        {/* Profile Card */}
+        {userProfile && (
+          <Animated.View entering={FadeInUp.delay(50)} style={styles.profileContainer}>
+            <NeumorphicView style={styles.profileCard}>
+              <View style={styles.profileHeader}>
+                <Avatar.Text 
+                  size={48} 
+                  label={userProfile.name.charAt(0).toUpperCase()} 
+                  style={{ backgroundColor: theme.colors.primary }}
+                />
+                <View style={styles.profileInfo}>
+                  <Text variant="titleMedium" style={{ fontWeight: 'bold' }}>
+                    {userProfile.name}
+                  </Text>
+                  <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>
+                    {userProfile.phone}
+                  </Text>
+                </View>
+              </View>
+              
+              <View style={styles.divider} />
+              
+              <View style={styles.docRow}>
+                <View style={styles.docItem}>
+                  <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant }}>
+                    {isKan ? 'ಆಧಾರ್' : 'AADHAAR'}
+                  </Text>
+                  <Text variant="bodyMedium">
+                    {userProfile.aadhaar ? `XXXX-XXXX-${userProfile.aadhaar.slice(-4)}` : (isKan ? 'ಸೇರಿಸಲಾಗಿಲ್ಲ' : 'Not Added')}
+                  </Text>
+                </View>
+                <View style={styles.docItem}>
+                  <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant }}>
+                    {isKan ? 'ಪಾನ್' : 'PAN'}
+                  </Text>
+                  <Text variant="bodyMedium">
+                    {userProfile.pan ? `${userProfile.pan.slice(0, 5)}XXXX` : (isKan ? 'ಸೇರಿಸಲಾಗಿಲ್ಲ' : 'Not Added')}
+                  </Text>
+                </View>
+              </View>
+            </NeumorphicView>
+          </Animated.View>
+        )}
+
         {/* Main Actions */}
         <View style={styles.actionGrid}>
           <Animated.View entering={FadeInUp.delay(100)} style={styles.actionItem}>
@@ -195,4 +247,11 @@ const styles = StyleSheet.create({
   sectionTitle: { marginBottom: 16, fontWeight: '900' },
   historyCard: { padding: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   historyRow: { flexDirection: 'row', alignItems: 'center' },
+  profileContainer: { paddingHorizontal: 20, marginTop: 20 },
+  profileCard: { padding: 16, borderRadius: 24 },
+  profileHeader: { flexDirection: 'row', alignItems: 'center' },
+  profileInfo: { marginLeft: 12 },
+  divider: { height: 1, backgroundColor: '#DDD', marginVertical: 12, opacity: 0.5 },
+  docRow: { flexDirection: 'row', justifyContent: 'space-between' },
+  docItem: { flex: 1 },
 });
