@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kisan Mitra — AI Farmer Assistant</title>
+  <meta name="description" content="AI-powered assistant helping Indian farmers discover and apply for government schemes. Supports Kannada and English." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Kannada:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ───────── NAV ───────── -->
+<nav class="navbar" id="navbar">
+  <div class="nav-brand">
+    <span class="nav-logo">🌾</span>
+    <span class="nav-title">Kisan <span class="accent">Mitra</span></span>
+  </div>
+  <div class="nav-links">
+    <button class="nav-btn active" onclick="showPage('dashboard')" id="nav-dashboard">Dashboard</button>
+    <button class="nav-btn" onclick="showPage('schemes')" id="nav-schemes">Schemes</button>
+    <button class="nav-btn" onclick="showPage('chat')" id="nav-chat">AI Chat</button>
+    <button class="nav-btn" onclick="showPage('documents')" id="nav-documents">📄 Documents</button>
+    <button class="nav-btn" onclick="showPage('applications')" id="nav-applications">My Applications</button>
+    <button class="nav-btn" onclick="showPage('profile')" id="nav-profile">My Profile</button>
+  </div>
+  <div class="nav-actions">
+    <span class="lang-toggle">
+      <button id="lang-en" class="lang-btn active" onclick="setLang('en')">EN</button>
+      <button id="lang-kn" class="lang-btn" onclick="setLang('kn')">ಕನ್ನಡ</button>
+    </span>
+    <div class="notif-bell" onclick="showPage('notifications')" id="notif-bell">
+      🔔 <span class="notif-badge hidden" id="notif-count">0</span>
+    </div>
+  </div>
+</nav>
+
+<!-- ───────── PAGES ───────── -->
+<main class="main-content">
+
+  <!-- REGISTER / LANDING -->
+  <section class="page active" id="page-register">
+    <div class="hero">
+      <div class="hero-text">
+        <div class="hero-tag">🇮🇳 Government Scheme Assistant</div>
+        <h1 class="hero-title">Your AI Partner<br/><span class="gradient-text">for Kisan Schemes</span></h1>
+        <p class="hero-sub">Discover schemes you qualify for, get forms pre-filled, and apply with confidence. Supports Kannada &amp; English.</p>
+        <div class="hero-stats">
+          <div class="stat"><span class="stat-num">50+</span><span class="stat-label">Schemes</span></div>
+          <div class="stat"><span class="stat-num">2</span><span class="stat-label">Languages</span></div>
+          <div class="stat"><span class="stat-num">100%</span><span class="stat-label">Free</span></div>
+        </div>
+        <div class="hero-cta-row">
+          <button class="btn-primary large" onclick="showPage('register-form')">
+            🌱 Register Now
+          </button>
+          <button class="btn-login-hero" onclick="showPage('login')">
+            🔑 Already registered? Login
+          </button>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="hero-card float-anim">
+          <div class="hero-card-icon">💰</div>
+          <div class="hero-card-text">
+            <strong>PM-KISAN</strong>
+            <span>₹6,000/year — You're Eligible!</span>
+          </div>
+        </div>
+        <div class="hero-card float-anim-2">
+          <div class="hero-card-icon">🌧️</div>
+          <div class="hero-card-text">
+            <strong>Crop Insurance</strong>
+            <span>Deadline: Dec 31, 2025</span>
+          </div>
+        </div>
+        <div class="hero-card float-anim-3">
+          <div class="hero-card-icon">☀️</div>
+          <div class="hero-card-text">
+            <strong>PM Kusum</strong>
+            <span>90% Subsidy on Solar Pump</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- REGISTER FORM -->
+  <section class="page" id="page-register-form">
+    <div class="form-page">
+      <div class="form-header">
+        <button class="back-btn" onclick="showPage('register')">← Back</button>
+        <h2>Farmer Registration</h2>
+        <p>Create your profile to discover eligible schemes</p>
+      </div>
+      <form class="reg-form" id="registerForm" onsubmit="registerFarmer(event)">
+        <div class="form-grid">
+          <div class="form-section">
+            <h3 class="section-title">👤 Personal Details</h3>
+            <div class="field-row">
+              <div class="field-group">
+                <label>Full Name *</label>
+                <input type="text" id="reg-name" placeholder="Rajesh Kumar" required />
+              </div>
+              <div class="field-group">
+                <label>Phone Number *</label>
+                <input type="tel" id="reg-phone" placeholder="9876543210" required pattern="[6-9][0-9]{9}" />
+              </div>
+            </div>
+            <div class="field-row">
+              <div class="field-group">
+                <label>Date of Birth</label>
+                <input type="date" id="reg-dob" />
+              </div>
+              <div class="field-group">
+                <label>Gender</label>
+                <select id="reg-gender">
+                  <option value="">Select</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+            </div>
+            <div class="field-group">
+              <label>Email (optional)</label>
+              <input type="email" id="reg-email" placeholder="rajesh@example.com" />
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3 class="section-title">📍 Location</h3>
+            <div class="field-row">
+              <div class="field-group">
+                <label>State *</label>
+                <select id="reg-state" required>
+                  <option value="">Select State</option>
+                  <option value="Karnataka">Karnataka</option>
+                  <option value="Andhra Pradesh">Andhra Pradesh</option>
+                  <option value="Telangana">Telangana</option>
+                  <option value="Tamil Nadu">Tamil Nadu</option>
+                  <option value="Maharashtra">Maharashtra</option>
+                  <option value="Rajasthan">Rajasthan</option>
+                  <option value="Uttar Pradesh">Uttar Pradesh</option>
+                  <option value="Madhya Pradesh">Madhya Pradesh</option>
+                  <option value="Punjab">Punjab</option>
+                  <option value="Haryana">Haryana</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label>District *</label>
+                <input type="text" id="reg-district" placeholder="Mysuru" required />
+              </div>
+            </div>
+            <div class="field-row">
+              <div class="field-group">
+                <label>Taluk</label>
+                <input type="text" id="reg-taluk" placeholder="Hunsur" />
+              </div>
+              <div class="field-group">
+                <label>Village</label>
+                <input type="text" id="reg-village" placeholder="Sargur" />
+              </div>
+            </div>
+            <div class="field-row">
+              <div class="field-group">
+                <label>PIN Code</label>
+                <input type="text" id="reg-pincode" placeholder="571105" pattern="[0-9]{6}" />
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3 class="section-title">🌾 Farm Details</h3>
+            <div class="field-row">
+              <div class="field-group">
+                <label>Land Size (Hectares) *</label>
+                <input type="number" id="reg-land" placeholder="1.5" step="0.1" min="0.1" required />
+              </div>
+              <div class="field-group">
+                <label>Primary Crop *</label>
+                <select id="reg-crop" required>
+                  <option value="">Select Crop</option>
+                  <option value="rice">Rice</option>
+                  <option value="wheat">Wheat</option>
+                  <option value="cotton">Cotton</option>
+                  <option value="sugarcane">Sugarcane</option>
+                  <option value="vegetables">Vegetables</option>
+                  <option value="fruits">Fruits</option>
+                  <option value="pulses">Pulses</option>
+                  <option value="oilseeds">Oilseeds</option>
+                  <option value="mixed">Mixed</option>
+                </select>
+              </div>
+            </div>
+            <div class="field-row">
+              <div class="field-group">
+                <label>Annual Income (₹)</label>
+                <input type="number" id="reg-income" placeholder="120000" />
+              </div>
+              <div class="field-group">
+                <label>Irrigation Type</label>
+                <select id="reg-irrigation">
+                  <option value="">Select</option>
+                  <option value="drip">Drip</option>
+                  <option value="flood">Flood</option>
+                  <option value="sprinkler">Sprinkler</option>
+                  <option value="rainfed">Rainfed</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3 class="section-title">🏦 Bank Details (Optional)</h3>
+            <div class="field-row">
+              <div class="field-group">
+                <label>Bank Account Number</label>
+                <input type="text" id="reg-account" placeholder="XXXX XXXX XXXX" />
+              </div>
+              <div class="field-group">
+                <label>IFSC Code</label>
+                <input type="text" id="reg-ifsc" placeholder="SBIN0001234" style="text-transform:uppercase" />
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3 class="section-title">🌐 Preferences</h3>
+            <div class="field-group">
+              <label>Preferred Language</label>
+              <select id="reg-lang">
+                <option value="en">English</option>
+                <option value="kn">ಕನ್ನಡ (Kannada)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- DOCUMENT UPLOAD SECTION -->
+          <div class="form-section">
+            <h3 class="section-title">📄 Upload Documents</h3>
+            <p style="font-size:.85rem;color:var(--text-muted);margin-bottom:1.25rem">Upload your documents now to speed up scheme applications. Tap an icon to capture or upload.</p>
+            <div class="reg-doc-grid">
+
+              <div class="reg-doc-card" id="rdoc-card-aadhaar">
+                <label for="rdoc-aadhaar" class="reg-doc-label">
+                  <div class="reg-doc-icon-wrap aadhaar">🪪</div>
+                  <span class="reg-doc-name">Aadhaar Card</span>
+                  <span class="reg-doc-hint">Identity Proof</span>
+                  <span class="reg-doc-status" id="rdoc-status-aadhaar">Tap to upload</span>
+                  <input type="file" id="rdoc-aadhaar" accept="image/*,application/pdf" capture="environment"
+                         onchange="handleRegDoc('aadhaar', this)" hidden />
+                </label>
+                <div class="reg-doc-preview hidden" id="rdoc-preview-aadhaar">
+                  <img id="rdoc-thumb-aadhaar" src="" alt="" />
+                  <button type="button" onclick="removeRegDoc('aadhaar')">✕</button>
+                </div>
+              </div>
+
+              <div class="reg-doc-card" id="rdoc-card-land">
+                <label for="rdoc-land" class="reg-doc-label">
+                  <div class="reg-doc-icon-wrap land">🗺️</div>
+                  <span class="reg-doc-name">Land Record</span>
+                  <span class="reg-doc-hint">RTC / Pahani / Khata</span>
+                  <span class="reg-doc-status" id="rdoc-status-land">Tap to upload</span>
+                  <input type="file" id="rdoc-land" accept="image/*,application/pdf" capture="environment"
+                         onchange="handleRegDoc('land', this)" hidden />
+                </label>
+                <div class="reg-doc-preview hidden" id="rdoc-preview-land">
+                  <img id="rdoc-thumb-land" src="" alt="" />
+                  <button type="button" onclick="removeRegDoc('land')">✕</button>
+                </div>
+              </div>
+
+              <div class="reg-doc-card" id="rdoc-card-bank">
+                <label for="rdoc-bank" class="reg-doc-label">
+                  <div class="reg-doc-icon-wrap bank">🏦</div>
+                  <span class="reg-doc-name">Bank Passbook</span>
+                  <span class="reg-doc-hint">First page with IFSC</span>
+                  <span class="reg-doc-status" id="rdoc-status-bank">Tap to upload</span>
+                  <input type="file" id="rdoc-bank" accept="image/*,application/pdf" capture="environment"
+                         onchange="handleRegDoc('bank', this)" hidden />
+                </label>
+                <div class="reg-doc-preview hidden" id="rdoc-preview-bank">
+                  <img id="rdoc-thumb-bank" src="" alt="" />
+                  <button type="button" onclick="removeRegDoc('bank')">✕</button>
+                </div>
+              </div>
+
+              <div class="reg-doc-card" id="rdoc-card-electricity">
+                <label for="rdoc-electricity" class="reg-doc-label">
+                  <div class="reg-doc-icon-wrap electricity">⚡</div>
+                  <span class="reg-doc-name">Electricity Bill</span>
+                  <span class="reg-doc-hint">Existing connection</span>
+                  <span class="reg-doc-status" id="rdoc-status-electricity">Tap to upload</span>
+                  <input type="file" id="rdoc-electricity" accept="image/*,application/pdf" capture="environment"
+                         onchange="handleRegDoc('electricity', this)" hidden />
+                </label>
+                <div class="reg-doc-preview hidden" id="rdoc-preview-electricity">
+                  <img id="rdoc-thumb-electricity" src="" alt="" />
+                  <button type="button" onclick="removeRegDoc('electricity')">✕</button>
+                </div>
+              </div>
+
+            </div>
+            <div class="reg-doc-progress">
+              <div class="reg-doc-bar"><div class="reg-doc-bar-fill" id="rdoc-bar-fill" style="width:0%"></div></div>
+              <span id="rdoc-bar-label">0 of 4 documents uploaded (optional)</span>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn-primary large" id="reg-submit-btn">
+            <span class="btn-text">Register &amp; Find Schemes →</span>
+            <span class="btn-loading hidden">⏳ Registering...</span>
+          </button>
+        </div>
+        <div id="reg-error" class="error-msg hidden"></div>
+      </form>
+    </div>
+  </section>
+
+  <!-- ──────────── LOGIN PAGE ──────────── -->
+  <section class="page" id="page-login">
+    <div class="auth-page">
+      <div class="auth-card">
+        <div class="auth-logo">🌾</div>
+        <h2 class="auth-title">Welcome Back</h2>
+        <p class="auth-sub">Enter your registered phone number to access your account</p>
+
+        <form id="loginForm" onsubmit="loginFarmer(event)" autocomplete="off">
+          <div class="auth-field">
+            <label for="login-phone">📱 Phone Number</label>
+            <input type="tel" id="login-phone" placeholder="9876543210"
+                   pattern="[6-9][0-9]{9}" maxlength="10"
+                   required autocomplete="tel" />
+          </div>
+          <button type="submit" class="btn-primary large" id="login-btn" style="width:100%;margin-top:1.5rem">
+            <span class="btn-text">🔑 Login →</span>
+            <span class="btn-loading hidden">⏳ Logging in...</span>
+          </button>
+          <div id="login-error" class="error-msg hidden"></div>
+        </form>
+
+        <div class="auth-divider"><span>New to Kisan Mitra?</span></div>
+        <button class="btn-outline" style="width:100%" onclick="showPage('register-form')">
+          🌱 Create an Account
+        </button>
+
+        <button class="auth-back" onclick="showPage('register')">← Back to Home</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- DASHBOARD -->
+  <section class="page" id="page-dashboard">
+    <div class="dashboard">
+      <div class="dash-header">
+        <div>
+          <h2 id="dash-greeting">Good morning, Farmer! 👋</h2>
+          <p id="dash-subtitle">Here's your scheme dashboard</p>
+        </div>
+        <button class="btn-primary" onclick="checkEligibility()">
+          🔍 Check Eligibility
+        </button>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-card green">
+          <div class="stat-icon">✅</div>
+          <div class="stat-info">
+            <span class="stat-val" id="stat-eligible">0</span>
+            <span class="stat-lbl">Eligible Schemes</span>
+          </div>
+        </div>
+        <div class="stat-card blue">
+          <div class="stat-icon">📋</div>
+          <div class="stat-info">
+            <span class="stat-val" id="stat-applied">0</span>
+            <span class="stat-lbl">Applications</span>
+          </div>
+        </div>
+        <div class="stat-card amber">
+          <div class="stat-icon">🔔</div>
+          <div class="stat-info">
+            <span class="stat-val" id="stat-notifs">0</span>
+            <span class="stat-lbl">Notifications</span>
+          </div>
+        </div>
+        <div class="stat-card purple">
+          <div class="stat-icon">💰</div>
+          <div class="stat-info">
+            <span class="stat-val" id="stat-benefit">₹0</span>
+            <span class="stat-lbl">Max Benefit</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="eligible-section" class="hidden">
+        <h3 class="section-heading">🎯 Schemes You Qualify For</h3>
+        <div class="scheme-cards" id="eligible-schemes"></div>
+      </div>
+
+      <div class="quick-actions">
+        <h3 class="section-heading">Quick Actions</h3>
+        <div class="action-grid">
+          <div class="action-card" onclick="checkEligibility()">
+            <div class="action-icon">🔍</div>
+            <strong>Check Eligibility</strong>
+            <span>Match schemes to my profile</span>
+          </div>
+          <div class="action-card" onclick="showPage('chat')">
+            <div class="action-icon">💬</div>
+            <strong>Ask AI Assistant</strong>
+            <span>Get answers in Kannada/English</span>
+          </div>
+          <div class="action-card" onclick="showPage('documents')">
+            <div class="action-icon">📄</div>
+            <strong>My Documents</strong>
+            <span>Upload Aadhaar, Land Record, etc.</span>
+          </div>
+          <div class="action-card" onclick="showPage('applications')">
+            <div class="action-icon">📋</div>
+            <strong>My Applications</strong>
+            <span>Track applied schemes</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCHEMES PAGE -->
+  <section class="page" id="page-schemes">
+    <div class="schemes-page">
+      <div class="schemes-header">
+        <h2>Government Schemes</h2>
+        <div class="scheme-filters">
+          <select id="filter-category" onchange="filterSchemes()">
+            <option value="">All Categories</option>
+            <option value="financial">Financial</option>
+            <option value="insurance">Insurance</option>
+            <option value="subsidy">Subsidy</option>
+            <option value="loan">Loan</option>
+          </select>
+        </div>
+      </div>
+      <div class="scheme-list" id="scheme-list">
+        <div class="loading-spinner">Loading schemes...</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FORM PREFILL MODAL (overlay) -->
+  <div class="modal-overlay hidden" id="prefill-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modal-title">Form Preview</h3>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+      </div>
+      <div class="modal-disclaimer">
+        ⚠️ Please review all fields carefully. You must complete OTP and final submission yourself.
+      </div>
+      <div class="prefill-fields" id="prefill-fields"></div>
+      <div class="modal-actions">
+        <button class="btn-outline" onclick="closeModal()">Cancel</button>
+        <button class="btn-primary" onclick="confirmApplication()">✅ Confirm &amp; Save Application</button>
+      </div>
+      <div id="modal-error" class="error-msg hidden"></div>
+      <div id="modal-success" class="success-msg hidden"></div>
+    </div>
+  </div>
+
+  <!-- ──────────── CHAT PAGE ──────────── -->
+  <section class="page" id="page-chat">
+    <div class="chat-page">
+      <div class="chat-header">
+        <div class="chat-avatar">🤖</div>
+        <div>
+          <h3>Kisan AI Assistant</h3>
+          <span class="online-dot">● Online</span>
+        </div>
+        <!-- Voice TTS toggle -->
+        <button class="voice-tts-toggle" id="tts-toggle" onclick="toggleTTS()" title="Toggle voice replies">
+          🔊 <span id="tts-label">Voice ON</span>
+        </button>
+      </div>
+
+      <div class="chat-messages" id="chat-messages">
+        <div class="chat-bubble bot">
+          <div class="bubble-content">Hello! I'm your Kisan Mitra AI 🌾 I can help you discover government schemes, check eligibility, and assist with applications. What would you like to know?</div>
+          <div class="chat-suggestions" id="initial-suggestions">
+            <button class="suggestion-chip" onclick="sendSuggestion('Which schemes am I eligible for?')">Which schemes am I eligible for?</button>
+            <button class="suggestion-chip" onclick="sendSuggestion('What documents do I need?')">What documents do I need?</button>
+            <button class="suggestion-chip" onclick="sendSuggestion('Tell me about PM-KISAN')">Tell me about PM-KISAN</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="chat-input-row">
+        <select class="lang-select" id="chat-lang" onchange="updateChatLang()">
+          <option value="en">EN</option>
+          <option value="kn">ಕನ್ನಡ</option>
+        </select>
+        <input type="text" id="chat-input" placeholder="Ask about schemes, eligibility... or press 🎤"
+               onkeydown="if(event.key==='Enter') sendChatMessage()" />
+        <!-- Mic button -->
+        <button class="mic-btn" id="mic-btn" onclick="toggleVoiceInput()" title="Speak your question">
+          🎤
+        </button>
+        <button class="chat-send-btn" onclick="sendChatMessage()">Send ➤</button>
+      </div>
+
+      <!-- Voice status bar -->
+      <div class="voice-status hidden" id="voice-status">
+        <span class="voice-pulse"></span>
+        <span id="voice-status-text">Listening... speak now</span>
+        <button onclick="stopVoiceInput()" style="background:none;border:none;color:#f87171;cursor:pointer;font-size:.85rem;">✕ Cancel</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ──────────── DOCUMENTS PAGE ──────────── -->
+  <section class="page" id="page-documents">
+    <div class="documents-page">
+      <div class="docs-header">
+        <h2>📄 My Documents</h2>
+        <p class="docs-subtitle">Upload and manage your required documents for scheme applications. All files are stored locally on your device.</p>
+      </div>
+
+      <div class="docs-required-banner">
+        <div class="docs-banner-icon">ℹ️</div>
+        <div>
+          <strong>Required Documents for Most Schemes</strong>
+          <p>Keep these 4 documents ready to apply for any government scheme quickly.</p>
+        </div>
+      </div>
+
+      <div class="doc-cards-grid">
+
+        <!-- Aadhaar Card -->
+        <div class="doc-card" id="doc-card-aadhaar">
+          <div class="doc-card-top">
+            <div class="doc-icon-wrap aadhaar">
+              <span class="doc-big-icon">🪪</span>
+            </div>
+            <div class="doc-status-badge" id="doc-status-aadhaar">Not Uploaded</div>
+          </div>
+          <div class="doc-card-info">
+            <h3>Aadhaar Card</h3>
+            <p>12-digit unique identity proof issued by UIDAI</p>
+            <ul class="doc-accepts">
+              <li>📷 Photo / Scan</li>
+              <li>📄 PDF / JPG / PNG</li>
+            </ul>
+          </div>
+          <div class="doc-card-actions">
+            <label class="doc-upload-btn" for="file-aadhaar">
+              📷 Capture / Upload
+              <input type="file" id="file-aadhaar" accept="image/*,application/pdf" capture="environment"
+                     onchange="handleDocUpload('aadhaar', this)" hidden />
+            </label>
+            <div class="doc-preview-wrap hidden" id="preview-aadhaar">
+              <img class="doc-thumb" id="thumb-aadhaar" src="" alt="Aadhaar preview" />
+              <button class="doc-remove-btn" onclick="removeDoc('aadhaar')">✕</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Land Record -->
+        <div class="doc-card" id="doc-card-land">
+          <div class="doc-card-top">
+            <div class="doc-icon-wrap land">
+              <span class="doc-big-icon">🗺️</span>
+            </div>
+            <div class="doc-status-badge" id="doc-status-land">Not Uploaded</div>
+          </div>
+          <div class="doc-card-info">
+            <h3>Land Record</h3>
+            <p>RTC / Pahani / Khata document proving land ownership</p>
+            <ul class="doc-accepts">
+              <li>📷 Photo / Scan</li>
+              <li>📄 PDF / JPG / PNG</li>
+            </ul>
+          </div>
+          <div class="doc-card-actions">
+            <label class="doc-upload-btn" for="file-land">
+              📷 Capture / Upload
+              <input type="file" id="file-land" accept="image/*,application/pdf" capture="environment"
+                     onchange="handleDocUpload('land', this)" hidden />
+            </label>
+            <div class="doc-preview-wrap hidden" id="preview-land">
+              <img class="doc-thumb" id="thumb-land" src="" alt="Land Record preview" />
+              <button class="doc-remove-btn" onclick="removeDoc('land')">✕</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bank Passbook -->
+        <div class="doc-card" id="doc-card-bank">
+          <div class="doc-card-top">
+            <div class="doc-icon-wrap bank">
+              <span class="doc-big-icon">🏦</span>
+            </div>
+            <div class="doc-status-badge" id="doc-status-bank">Not Uploaded</div>
+          </div>
+          <div class="doc-card-info">
+            <h3>Bank Passbook</h3>
+            <p>First page showing account number, IFSC &amp; holder name</p>
+            <ul class="doc-accepts">
+              <li>📷 Photo / Scan</li>
+              <li>📄 PDF / JPG / PNG</li>
+            </ul>
+          </div>
+          <div class="doc-card-actions">
+            <label class="doc-upload-btn" for="file-bank">
+              📷 Capture / Upload
+              <input type="file" id="file-bank" accept="image/*,application/pdf" capture="environment"
+                     onchange="handleDocUpload('bank', this)" hidden />
+            </label>
+            <div class="doc-preview-wrap hidden" id="preview-bank">
+              <img class="doc-thumb" id="thumb-bank" src="" alt="Bank Passbook preview" />
+              <button class="doc-remove-btn" onclick="removeDoc('bank')">✕</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Electricity Bill -->
+        <div class="doc-card" id="doc-card-electricity">
+          <div class="doc-card-top">
+            <div class="doc-icon-wrap electricity">
+              <span class="doc-big-icon">⚡</span>
+            </div>
+            <div class="doc-status-badge" id="doc-status-electricity">Not Uploaded</div>
+          </div>
+          <div class="doc-card-info">
+            <h3>Electricity Bill</h3>
+            <p>Recent electricity bill (existing connection) as address proof</p>
+            <ul class="doc-accepts">
+              <li>📷 Photo / Scan</li>
+              <li>📄 PDF / JPG / PNG</li>
+            </ul>
+          </div>
+          <div class="doc-card-actions">
+            <label class="doc-upload-btn" for="file-electricity">
+              📷 Capture / Upload
+              <input type="file" id="file-electricity" accept="image/*,application/pdf" capture="environment"
+                     onchange="handleDocUpload('electricity', this)" hidden />
+            </label>
+            <div class="doc-preview-wrap hidden" id="preview-electricity">
+              <img class="doc-thumb" id="thumb-electricity" src="" alt="Electricity Bill preview" />
+              <button class="doc-remove-btn" onclick="removeDoc('electricity')">✕</button>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- end doc-cards-grid -->
+
+      <!-- Document Readiness Summary -->
+      <div class="doc-readiness-card">
+        <h3>📊 Document Readiness</h3>
+        <div class="doc-readiness-bar-wrap">
+          <div class="doc-readiness-bar">
+            <div class="doc-readiness-fill" id="doc-readiness-fill" style="width:0%"></div>
+          </div>
+          <span id="doc-readiness-pct">0 / 4 uploaded</span>
+        </div>
+        <p class="doc-readiness-hint" id="doc-readiness-hint">Upload all 4 documents to be fully prepared for scheme applications.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ──────────── MY APPLICATIONS PAGE ──────────── -->
+  <section class="page" id="page-applications">
+    <div class="apps-page">
+      <div class="apps-header">
+        <h2>📋 My Applications</h2>
+        <button class="btn-primary" onclick="loadMyApplications()">🔄 Refresh</button>
+      </div>
+
+      <div class="apps-summary-row" id="apps-summary-row">
+        <div class="apps-stat-card">
+          <span class="apps-stat-num" id="apps-total">0</span>
+          <span class="apps-stat-lbl">Total Applied</span>
+        </div>
+        <div class="apps-stat-card prefilled-card">
+          <span class="apps-stat-num" id="apps-prefilled">0</span>
+          <span class="apps-stat-lbl">Pre-filled</span>
+        </div>
+        <div class="apps-stat-card submitted-card">
+          <span class="apps-stat-num" id="apps-submitted">0</span>
+          <span class="apps-stat-lbl">Submitted</span>
+        </div>
+      </div>
+
+      <div id="apps-list-container">
+        <div class="loading-spinner" id="apps-loading">Loading your applications...</div>
+        <div id="apps-list"></div>
+        <p class="empty-state hidden" id="apps-empty">You haven't applied for any scheme yet. <a onclick="showPage('schemes')" style="cursor:pointer;color:var(--primary)">Browse Schemes →</a></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROFILE PAGE -->
+  <section class="page" id="page-profile">
+    <div class="profile-page">
+      <div class="profile-page-header">
+        <h2>My Profile</h2>
+        <div class="profile-header-actions" id="profile-header-actions" style="display:none">
+          <button class="btn-outline" onclick="openEditProfile()">✏️ Edit Profile</button>
+          <button class="btn-logout" onclick="logoutFarmer()">🚪 Logout</button>
+        </div>
+      </div>
+      <div class="profile-card" id="profile-details">
+        <div class="profile-placeholder">
+          <p>No profile found. <a onclick="showPage('register-form')" style="cursor:pointer;color:var(--primary)">Register here</a></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EDIT PROFILE MODAL -->
+  <div class="modal-overlay hidden" id="edit-profile-modal">
+    <div class="modal" style="max-width:560px">
+      <div class="modal-header">
+        <h3>✏️ Edit Profile</h3>
+        <button class="modal-close" onclick="closeEditProfile()">✕</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:.75rem;margin-bottom:1.5rem">
+        <div class="field-group"><label>Full Name</label><input id="edit-name" type="text" /></div>
+        <div class="field-group"><label>Email</label><input id="edit-email" type="email" /></div>
+        <div class="field-group"><label>Annual Income (₹)</label><input id="edit-income" type="number" /></div>
+        <div class="field-group"><label>Land Size (Hectares)</label><input id="edit-land" type="number" step="0.1" /></div>
+        <div class="field-group"><label>Primary Crop</label>
+          <select id="edit-crop">
+            <option value="rice">Rice</option><option value="wheat">Wheat</option>
+            <option value="cotton">Cotton</option><option value="sugarcane">Sugarcane</option>
+            <option value="vegetables">Vegetables</option><option value="fruits">Fruits</option>
+            <option value="pulses">Pulses</option><option value="oilseeds">Oilseeds</option>
+            <option value="mixed">Mixed</option>
+          </select>
+        </div>
+        <div class="field-group"><label>Preferred Language</label>
+          <select id="edit-lang"><option value="en">English</option><option value="kn">ಕನ್ನಡ</option></select>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-outline" onclick="closeEditProfile()">Cancel</button>
+        <button class="btn-primary" onclick="saveEditProfile()">💾 Save Changes</button>
+      </div>
+      <div id="edit-profile-msg" class="success-msg hidden"></div>
+      <div id="edit-profile-err" class="error-msg hidden"></div>
+    </div>
+  </div>
+
+  <!-- NOTIFICATIONS PAGE -->
+  <section class="page" id="page-notifications">
+    <div class="notif-page">
+      <h2>Notifications 🔔</h2>
+      <div id="notif-list">
+        <p class="empty-state">No notifications yet. Register to get scheme alerts!</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>
