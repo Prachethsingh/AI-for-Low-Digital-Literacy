@@ -27,7 +27,10 @@ import {
   Message, 
   AssignmentTurnedIn, 
   Info,
-  PhoneIphone
+  PhoneIphone,
+  History,
+  TrendingUp,
+  AccountCircle
 } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
@@ -103,6 +106,7 @@ const App: React.FC = () => {
   const [currentQ, setCurrentQ] = useState(0);
   const [answers, setAnswers] = useState<Record<string, any>>({});
   const [eligibleSchemes, setEligibleSchemes] = useState<any[]>([]);
+  const [activityHistory, setActivityHistory] = useState<any[]>([]);
 
   const chatEndRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
@@ -179,6 +183,13 @@ const App: React.FC = () => {
       const answer = res.data.response;
       setMessages(prev => [...prev, { role: 'assistant', content: answer }]);
       speak(answer);
+      
+      // Track activity
+      setActivityHistory(prev => [{
+        type: 'query',
+        text: text,
+        timestamp: new Date().toLocaleTimeString()
+      }, ...prev].slice(0, 5));
     } catch (err) {
       const errorMsg = "Could not reach AI. Please ensure the backend is running.";
       setMessages(prev => [...prev, { role: 'assistant', content: errorMsg }]);
@@ -211,8 +222,17 @@ const App: React.FC = () => {
           profile: newAnswers,
           lang: lang
         });
-        setEligibleSchemes(res.data.schemes);
-        setMode('idle'); // Or a results mode
+        const schemes = res.data.eligible_schemes || [];
+        setEligibleSchemes(schemes);
+        
+        // Track activity
+        setActivityHistory(prev => [{
+          type: 'eligibility',
+          text: `Found ${schemes.length} schemes`,
+          timestamp: new Date().toLocaleTimeString()
+        }, ...prev].slice(0, 5));
+        
+        setMode('idle'); 
       } catch (err) {
         console.error(err);
       } finally {
@@ -285,17 +305,45 @@ const App: React.FC = () => {
                 {eligibleSchemes.length > 0 && (
                   <Fade in={true}>
                     <Box sx={{ mt: 4 }}>
-                      <Typography variant="subtitle2" color="primary" sx={{ mb: 2, textTransform: 'uppercase' }}>
-                        Eligible Schemes
+                      <Typography variant="subtitle2" color="primary" sx={{ mb: 2, textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <TrendingUp fontSize="small" /> Eligible Schemes
                       </Typography>
                       {eligibleSchemes.map(s => (
-                        <Paper key={s.id} sx={{ p: 2, mb: 1, borderLeft: '4px solid', borderColor: 'primary.main' }}>
+                        <Paper key={s.id} sx={{ p: 2, mb: 1, borderLeft: '4px solid', borderColor: 'primary.main', background: 'rgba(46, 125, 50, 0.05)' }}>
                           <Typography variant="body2" fontWeight="bold">{s.name_en}</Typography>
                         </Paper>
                       ))}
                     </Box>
                   </Fade>
                 )}
+
+                {/* --- Farmer Activity Tracker --- */}
+                <Box sx={{ mt: 4 }}>
+                  <Typography variant="subtitle2" color="primary" sx={{ mb: 2, textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <History fontSize="small" /> Activity Tracker
+                  </Typography>
+                  <Paper sx={{ p: 0, overflow: 'hidden', bgcolor: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}>
+                    <List sx={{ p: 0 }}>
+                      {activityHistory.length === 0 ? (
+                        <ListItem><ListItemText secondary="No recent activity" /></ListItem>
+                      ) : (
+                        activityHistory.map((h, i) => (
+                          <ListItem key={i} sx={{ borderBottom: i < activityHistory.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none' }}>
+                            <Avatar sx={{ width: 32, height: 32, mr: 2, bgcolor: h.type === 'query' ? 'secondary.main' : 'primary.main' }}>
+                              {h.type === 'query' ? <Message sx={{ fontSize: 16 }} /> : <AssignmentTurnedIn sx={{ fontSize: 16 }} />}
+                            </Avatar>
+                            <ListItemText 
+                              primary={h.text} 
+                              secondary={h.timestamp}
+                              primaryTypographyProps={{ variant: 'body2', noWrap: true }}
+                              secondaryTypographyProps={{ variant: 'caption' }}
+                            />
+                          </ListItem>
+                        ))
+                      )}
+                    </List>
+                  </Paper>
+                </Box>
               </Box>
             </Grid>
 

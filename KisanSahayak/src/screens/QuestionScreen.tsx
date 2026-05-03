@@ -12,6 +12,8 @@ import {
   Platform,
   PermissionsAndroid,
   useWindowDimensions,
+  Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -39,7 +41,7 @@ export default function QuestionScreen() {
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute<RouteType>();
   const { flowId, step } = route.params;
-  const { language } = useAppContext();
+  const { language, backendUrl } = useAppContext();
   const theme = useTheme();
 
   const flow = FLOWS[flowId];
@@ -52,6 +54,8 @@ export default function QuestionScreen() {
   const frameMargin = isLargeScreen ? 80 : 40;
 
   const [photoUri, setPhotoUri] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [ocrResult, setOcrResult] = useState<string | null>(null);
 
   const questionText = isKan ? question.textKn : question.textEn;
   const progress = (step + 1) / flow.questions.length;
@@ -109,10 +113,49 @@ export default function QuestionScreen() {
         quality: 0.5,
       });
       if (result.assets && result.assets.length > 0) {
-        setPhotoUri(result.assets[0].uri || null);
-        setTimeout(() => handleNext(), 1500);
+        const uri = result.assets[0].uri!;
+        setPhotoUri(uri);
+        await processOCR(uri, result.assets[0].fileName || 'document.jpg');
       }
-    } catch {
+    } catch (err) {
+      console.error(err);
+      handleNext();
+    }
+  };
+
+  const processOCR = async (uri: string, filename: string) => {
+    setIsProcessing(true);
+    setOcrResult(isKan ? 'ದಾಖಲೆ ಪರಿಶೀಲಿಸಲಾಗುತ್ತಿದೆ...' : 'Verifying document...');
+    
+    try {
+      const formData = new FormData();
+      formData.append('file', {
+        uri: Platform.OS === 'android' ? uri : uri.replace('file://', ''),
+        type: 'image/jpeg',
+        name: filename,
+      } as any);
+
+      const resp = await fetch(`${backendUrl}/ocr`, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      const data = await resp.json();
+      const message = data.text || (isKan ? 'ದಾಖಲೆ ಯಶಸ್ವಿಯಾಗಿ ಸೆರೆಹಿಡಿಯಲಾಗಿದೆ.' : 'Document captured successfully.');
+      setOcrResult(message);
+      Tts.speak(message);
+      
+      // Wait a bit for user to see result then go next
+      setTimeout(() => {
+        setIsProcessing(false);
+        handleNext();
+      }, 3000);
+    } catch (error) {
+      console.error('OCR Error:', error);
+      setIsProcessing(false);
       handleNext();
     }
   };
@@ -226,6 +269,24 @@ export default function QuestionScreen() {
           </Text>
         </View>
       </View>
+    );
+  }
+
+  if (isProcessing) {
+    return (
+      <SafeAreaView style={[styles.safeArea, { backgroundColor: theme.colors.background, justifyContent: 'center' }]}>
+        <View style={styles.processingContainer}>
+          <ActivityIndicator size="large" color={theme.colors.primary} />
+          <Surface style={styles.ocrResultCard} elevation={2}>
+             <Text variant="headlineSmall" style={{ textAlign: 'center', color: theme.colors.primary }}>
+               {isKan ? 'ಪರಿಶೀಲನೆ ನಡೆಯುತ್ತಿದೆ' : 'Processing...'}
+             </Text>
+             <Text variant="bodyLarge" style={{ textAlign: 'center', marginTop: 16 }}>
+               {ocrResult}
+             </Text>
+          </Surface>
+        </View>
+      </SafeAreaView>
     );
   }
 
@@ -416,5 +477,15 @@ const styles = StyleSheet.create({
   micFooter: {
     alignItems: 'center',
     paddingVertical: 16,
+  },
+  processingContainer: {
+    alignItems: 'center',
+    padding: 32,
+  },
+  ocrResultCard: {
+    marginTop: 32,
+    padding: 24,
+    borderRadius: 24,
+    width: '100%',
   },
 });
