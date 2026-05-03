@@ -44,6 +44,12 @@ export default function HomeScreen({ navigation }: Props) {
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <LanguageToggle />
             <IconButton 
+              icon="cog" 
+              iconColor={theme.colors.onPrimary} 
+              onPress={() => navigation.navigate('Settings')} 
+              size={24}
+            />
+            <IconButton 
               icon="logout" 
               iconColor={theme.colors.onPrimary} 
               onPress={logout} 
@@ -184,6 +190,30 @@ export default function HomeScreen({ navigation }: Props) {
                   />
                   <Text variant="titleMedium" style={styles.actionLabel}>
                     {isKan ? 'ಎಲ್ಲ ಯೋಜನೆ' : 'All Schemes'}
+                  </Text>
+                </View>
+              </TouchableRipple>
+            </NeumorphicView>
+          </Animated.View>
+        </View>
+
+        <View style={styles.actionGrid}>
+          <Animated.View entering={FadeInUp.delay(500)} style={styles.actionItem}>
+            <NeumorphicView style={styles.neumorphicAction}>
+              <TouchableRipple
+                onPress={() => navigation.navigate('DocumentVault')}
+                style={styles.ripple}
+                borderless
+              >
+                <View style={styles.actionInner}>
+                  <Avatar.Icon
+                    size={avatarSize}
+                    icon="safe-square"
+                    style={{ backgroundColor: theme.colors.primaryContainer }}
+                    color={theme.colors.onPrimaryContainer}
+                  />
+                  <Text variant="titleMedium" style={styles.actionLabel}>
+                    {isKan ? 'ದಾಖಲೆಗಳು' : 'Documents'}
                   </Text>
                 </View>
               </TouchableRipple>
