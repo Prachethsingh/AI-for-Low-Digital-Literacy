@@ -45,6 +45,11 @@ export default function SchemeDetailScreen({ route, navigation }: Props) {
               onPress={() => navigation.goBack()} 
             />
             <IconButton 
+              icon="volume-high" 
+              iconColor="white" 
+              onPress={() => AudioController.speak(isKan ? scheme.description_kn : scheme.description_en, language)} 
+            />
+            <IconButton 
               icon="share-variant" 
               iconColor="white" 
               onPress={() => {}} 

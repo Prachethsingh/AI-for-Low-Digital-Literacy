@@ -221,6 +221,23 @@ export default function HomeScreen({ navigation }: Props) {
           </Animated.View>
         </View>
 
+        {/* Daily Tip Section */}
+        <Animated.View entering={FadeInUp.delay(200)} style={styles.tipSection}>
+          <NeumorphicView style={styles.tipCard}>
+            <View style={styles.tipHeader}>
+              <Avatar.Icon size={32} icon="lightbulb-on" style={{ backgroundColor: theme.colors.tertiary }} color="white" />
+              <Text variant="titleSmall" style={[styles.tipTitle, { color: theme.colors.tertiary }]}>
+                {isKan ? 'ಇಂದಿನ ಸಲಹೆ' : 'Daily Tip'}
+              </Text>
+            </View>
+            <Text variant="bodyMedium" style={styles.tipText}>
+              {isKan 
+                ? 'ನಿಮ್ಮ ಮಣ್ಣಿನ ಫಲವತ್ತತೆ ಹೆಚ್ಚಿಸಲು ಸಾವಯವ ಗೊಬ್ಬರ ಬಳಸಿ. ಇದು ಭೂಮಿಯ ಆರೋಗ್ಯವನ್ನು ಕಾಪಾಡುತ್ತದೆ.'
+                : 'Use organic fertilizers to increase soil fertility. It helps maintain the long-term health of your land.'}
+            </Text>
+          </NeumorphicView>
+        </Animated.View>
+
         {/* History / Insights Section */}
         {history?.eligibleSchemes && history.eligibleSchemes.length > 0 && (
           <Animated.View entering={FadeInUp.delay(300)} style={styles.historySection}>
@@ -274,6 +291,11 @@ const styles = StyleSheet.create({
   actionInner: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 16 },
   actionLabel: { marginTop: 12, fontWeight: '800', textAlign: 'center' },
   historySection: { marginTop: 32, paddingHorizontal: 20 },
+  tipSection: { marginTop: 32, paddingHorizontal: 20 },
+  tipCard: { padding: 16, borderRadius: 24 },
+  tipHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
+  tipTitle: { marginLeft: 8, fontWeight: '900', textTransform: 'uppercase' },
+  tipText: { lineHeight: 22, opacity: 0.8 },
   sectionTitle: { marginBottom: 16, fontWeight: '900' },
   historyCard: { padding: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   historyRow: { flexDirection: 'row', alignItems: 'center' },

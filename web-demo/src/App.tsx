@@ -30,7 +30,10 @@ import {
   PhoneIphone,
   History,
   TrendingUp,
-  AccountCircle
+  AccountCircle,
+  AccountBalanceWallet,
+  Settings,
+  Analytics
 } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
@@ -97,7 +100,7 @@ interface MessageData {
 
 const App: React.FC = () => {
   const [lang, setLang] = useState<'en' | 'kn'>('en');
-  const [mode, setMode] = useState<'idle' | 'chat' | 'eligibility'>('idle');
+  const [mode, setMode] = useState<'idle' | 'chat' | 'eligibility' | 'vault'>('idle');
   const [messages, setMessages] = useState<MessageData[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -344,6 +347,28 @@ const App: React.FC = () => {
                     </List>
                   </Paper>
                 </Box>
+
+                {/* --- Demo Control Panel --- */}
+                <Box sx={{ mt: 4 }}>
+                  <Typography variant="subtitle2" color="secondary" sx={{ mb: 2, textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Settings fontSize="small" /> Judge Controls
+                  </Typography>
+                  <Grid container spacing={1}>
+                    <Grid item xs={6}>
+                      <Button fullWidth variant="outlined" size="small" onClick={() => setMode('vault')}>
+                        Show Vault
+                      </Button>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Button fullWidth variant="outlined" size="small" onClick={() => {
+                        setActivityHistory(prev => [{ type: 'success', text: 'Aadhaar Verified via Web Simulation', timestamp: new Date().toLocaleTimeString() }, ...prev]);
+                        setEligibleSchemes(prev => prev.length === 0 ? [{ id: 'pmkisan', name_en: 'PM-KISAN (Pre-verified)' }] : prev);
+                      }}>
+                        Verify Aadhaar
+                      </Button>
+                    </Grid>
+                  </Grid>
+                </Box>
               </Box>
             </Grid>
 
@@ -475,6 +500,28 @@ const App: React.FC = () => {
                             {lang === 'en' ? 'No, Incorrect' : 'ಇಲ್ಲ'}
                           </Button>
                         </Box>
+                      </Box>
+                    )}
+
+                    {mode === 'vault' && (
+                      <Box sx={{ p: 1 }}>
+                        <Typography variant="h6" sx={{ mb: 3 }}>Document Vault</Typography>
+                        <Grid container spacing={2}>
+                          <Grid item xs={12}>
+                            <Paper sx={{ p: 2, bgcolor: 'rgba(46, 125, 50, 0.1)', border: '1px solid rgba(46, 125, 50, 0.2)' }}>
+                              <Typography variant="subtitle2" color="primary">Aadhaar Card</Typography>
+                              <Typography variant="body2" sx={{ mt: 1 }}>Status: Verified ✅</Typography>
+                            </Paper>
+                          </Grid>
+                          <Grid item xs={12}>
+                            <Paper sx={{ p: 2, bgcolor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)' }}>
+                              <Typography variant="subtitle2">PAN Card</Typography>
+                              <Typography variant="body2" sx={{ mt: 1, opacity: 0.6 }}>Status: Pending ⏳</Typography>
+                              <Button variant="text" size="small" sx={{ mt: 1 }}>Scan Now</Button>
+                            </Paper>
+                          </Grid>
+                        </Grid>
+                        <Button fullWidth variant="outlined" sx={{ mt: 4 }} onClick={() => setMode('idle')}>Back to Home</Button>
                       </Box>
                     )}
                   </Box>
